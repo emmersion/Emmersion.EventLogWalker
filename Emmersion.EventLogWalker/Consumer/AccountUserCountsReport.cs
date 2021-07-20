@@ -18,7 +18,7 @@ namespace Emmersion.EventLogWalker.Consumer
         private readonly IJsonSerializer jsonSerializer;
         private readonly IFileSystem fileSystem;
         private readonly TimeTracker eventTimeTracker;
-        DateTimeOffset killTime = DateTimeOffset.UtcNow + TimeSpan.Parse("00:10:27.0140000");
+        // DateTimeOffset killTime = DateTimeOffset.UtcNow + TimeSpan.Parse("00:10:27.0140000");
 
 
         public AccountUserCountsReport(IEventLogWalker eventLogWalker, ICsvWriter csvWriter,
