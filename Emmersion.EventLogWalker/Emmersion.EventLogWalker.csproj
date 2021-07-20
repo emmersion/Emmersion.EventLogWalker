@@ -5,8 +5,11 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="Emmersion.Http" Version="4.0.2" />
       <PackageReference Include="Scrutor" Version="3.3.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Emmersion.Http\Emmersion.Http\Emmersion.Http.csproj" />
     </ItemGroup>
 
 </Project>
