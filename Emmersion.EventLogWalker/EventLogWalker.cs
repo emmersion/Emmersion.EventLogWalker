@@ -23,7 +23,7 @@ namespace Emmersion.EventLogWalker
             this.stateProcessor = stateProcessor;
             this.jsonSerializer = jsonSerializer;
             this.resourceThrottle = resourceThrottle;
-            resourceThrottle.MinimumDurationBetweenAccess = TimeSpan.FromSeconds(.5);
+            resourceThrottle.MinimumDurationBetweenAccess = TimeSpan.FromSeconds(1);
         }
 
         public Task<IEventLogWalkerStatus> WalkAsync(WalkArgs args, Func<InsightEvent, IEventLogWalkerStatus, Task> eventProcessor)
