@@ -1,0 +1,44 @@
+trigger:
+  batch: true
+  branches:
+    include:
+    - main
+  paths:
+    exclude:
+      - .gitignore
+      - README.md
+pr: none
+pool:
+  vmImage: 'ubuntu-latest'
+name: 0.1$(Rev:.r)-alpha
+variables:
+  - group: 'NuGetPublishing'
+steps:
+- task: NuGetToolInstaller@1
+- task: DotNetCoreCLI@2
+  displayName: 'Test'
+  inputs:
+    command: 'test'
+    projects: '**/*Tests.csproj'
+- task: DotNetCoreCLI@2
+  displayName: 'Package'
+  inputs:
+    command: 'pack'
+    packagesToPack: '**/Emmersion.EventLogWalker.csproj'
+    versioningScheme: 'byBuildNumber'
+- task: NuGetCommand@2
+  displayName: 'Publish to internal feed'
+  inputs:
+    command: 'push'
+    packagesToPush: '$(Build.ArtifactStagingDirectory)/**/*.nupkg;!$(Build.ArtifactStagingDirectory)/**/*.symbols.nupkg'
+    nuGetFeedType: 'internal'
+    publishVstsFeed: '2ee1cde5-9787-4e91-b498-e30a43c5d914'
+- task: DotNetCoreCLI@2
+  displayName: 'Publish to nuget.org'
+  inputs:
+    command: custom
+    custom: nuget
+    arguments: >
+      push $(Build.ArtifactStagingDirectory)/**/*.nupkg
+      -s https://api.nuget.org/v3/index.json
+      -k $(NuGetPublishingApiKey)
