@@ -1,6 +1,6 @@
 # Emmersion.EventLogWalker
 
-Event logs can contain millions of records making them unsuited for direct query access.This library aims to simplify reading event logs by providing a resumable event log walker which exposes a single item at a time.
+Event logs can contain millions of records making them unsuited for direct query access. This library aims to simplify reading event logs by providing a resumable event log walker which exposes a single item at a time.
 
 Today this library is tightly coupled to the Insights product context event log.
 
@@ -36,7 +36,7 @@ Call either:
 Example call to `WalkAsync()` with default `args` and a synchronous `eventProcessor`:
 
 ```c#
-var finalStatus = await walker.WalkAsync(new WalkArgs(), (insightEvent, status) =>
+var finalStatus = await walker.WalkAsync(args: new WalkArgs(), eventProcessor: (insightEvent, status) =>
 {
     // your custom insightEvent processing code goes here
 });
@@ -58,23 +58,23 @@ if (finalStatus.Exception != null)
 
 ### `IEventLogWalker`
 Methods:
-- `IEventLogWalkerStatus WalkAsync(WalkArgs args, Action<InsightEvent, IEventLogWalkerStatus> eventProcessor)`: Used to process each `InsightEvent` synchronously, like when all state is stored only in memory.
-- `IEventLogWalkerStatus WalkAsync(WalkArgs args, Func<InsightEvent, IEventLogWalkerStatus, Task> eventProcessor)`: Used to process each `InsightEvent` asynchronously, like when writing to disk or a database.
+- `Task<IEventLogWalkerStatus> WalkAsync(WalkArgs args, Action<InsightEvent, IEventLogWalkerStatus> eventProcessor)`: Use this to process each `InsightEvent` synchronously, like when all state is stored only in memory.
+- `Task<IEventLogWalkerStatus> WalkAsync(WalkArgs args, Func<InsightEvent, IEventLogWalkerStatus, Task> eventProcessor)`: Use this to process each `InsightEvent` asynchronously, like when writing to disk or a database.
 
 ### `WalkArgs`
 Properties:
 - `StartInclusive`: The earliest (inclusive) InsightEvent to read. Default: `DateTimeOffset.MinValue`.
 - `EndExclusive`: The latest (exlusive) InsightEvent to read. Default: `DateTimeOffset.MaxValue` 
-- `ResumeToken`: The `string` returned by `IEventLogWalkerStatus.GetResumeToken()` from an earlier run.
+- `ResumeToken`: When provided the walker will resume processing instead of beginning at the `StartInclusive` date/time.
 
 ### `IEventLogWalkerStatus`
-The object `IEventLogWalkerStatus` is provided to the `EventProcessor` function and returned by `WalkAsync()`. It contains information which can be used to make decisions about logging and persisting state for resuming.
+Contains information which can be used to make decisions about logging and persisting state for resuming.
 
 Properties:
-- `PageNumber`: The current page being processed or the last page processed when returned from `WalkAsync()`. (1 based)
-- `PageEventIndex`: The index of the current event being processed or the last index attempted to be processed when returned from `WalkAsync()`.
-- `PageEventsCount`: The count of events on the current page.
-- `PageStatus` values:
+- `PageNumber`: The page being processed. One (1) based counter.
+- `PageEventIndex`: The index of the event being processed.
+- `PageEventsCount`: The count of events on the page.
+- `PageStatus` (enum values):
     - `Empty`: The page contains no events.
     - `Start`: Processing the first event of the page.
     - `InProgress`: Processing an event of the page which is not the first or last event.
@@ -84,13 +84,13 @@ Properties:
 - `Exception`: Is not `null` when an error has occurred.
 
 Methods:
-- `string GetResumeToken()`: Returns a resume token which can be passed to `WalkArgs.ResumeToken` to resume walking at the current event.
+- `string GetResumeToken()`: Returns a `resumeToken` which can be passed to `WalkArgs.ResumeToken` to resume walking at the `PageEventIndex`.
 
 ### `InsightEvent`
 Properties:
-- `Id`: Unique Id in the Insights product context, useful when troubleshooting issues with Insights.
-- `BrowserTimestamp`: When the browser thought the event occured
-- `ServerTimestamp`: When the server received the event. Use this as the true time of occurance.
+- `Id`: Unique Id in the Insights product context, useful when troubleshooting issues with the Insights team.
+- `BrowserTimestamp`: When the browser thought the event occured.
+- `ServerTimestamp`: When the server delared the event occured. Use this as the true time of occurance.
 - `UserId`: Which user triggered the event.
 - `AccountId`: Which account the user belongs to.
 - `AuthSession`: Which session the user triggered the event during.
@@ -102,17 +102,17 @@ Properties:
 
 Walking the EventLog can take hours to complete depending on the range of data specified in `WalkArgs`. Being able to resume after a failure or being able to stop and restart a walk can be very useful. Some things to keep in mind when enabling resuming:
 
-- You get the resume token by calling `IEventLogWalkerStatus.GetResumeToken()`. Do not modify that token. Consider it a black box.
-- When saving the resume token you also need to save the state of your custom processing.
-- When saving state in the `EventProcessor` _only_ do so *before* processing that `InsightEvent`. If you persist after then when resuming it will process that `InsightEvent` a second time.
+- You get the `resumeToken` by calling `IEventLogWalkerStatus.GetResumeToken()`. Do not modify that token. Consider it a black box.
+- When saving the `resumeToken` you also need to save the state of your report.
+- When saving state in the `eventProcessor` _only_ do so *before* processing the `insightEvent`. If you persist after then when resuming it will process that `InsightEvent` a second time.
 - Writing to disk can be expensive so we do not recommend saving state before processing each `InsightEvent`.
-- We recommend saving state every so often as a checkpoint.
-- We recommend always saving state when `status.Exception` is not `null`.
+- We recommend saving state every so often as a checkpoint. For example, at the start of each page when `status.PageStatus == PageStatus.Start`.
+- We recommend always saving state when the `status` returned by `WalkAsync()` has a non-`null` value for `status.Exception`.
 
 Example:
 
 ```c#
-var resumeToken = LoadState(); // load custom state and pass the resume token to `WalkArgs.ResumeToken`
+var resumeToken = LoadState(); // load custom state and pass the `resumeToken` to `WalkArgs.ResumeToken`
 
 var finalStatus = await walker.WalkAsync(new WalkArgs{ resumeToken = resumeToken}, (insightEvent, status) =>
 {
