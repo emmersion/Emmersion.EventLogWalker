@@ -1,6 +1,8 @@
 # Emmersion.EventLogWalker
 
-Simplifies access to the Insights EventLog by providing a resumable `EventLogWalker` that exposes a single `InsightEvent` at a time.
+Event logs can contain millions of records making them unsuited for direct query access.This library aims to simplify reading event logs by providing a resumable event log walker which exposes a single item at a time.
+
+Today this library is tightly coupled to the Insights product context event log.
 
 ## Configuration
 
@@ -12,40 +14,26 @@ You must also provide and register implementations for:
 
 - `IInsightsSystemApiSettings`
 
-## Usage
+## Getting started
 
-To get started, inject an `IEventLogWalker` into the class that will read the EventLog.
+This documentation will refer to consumers of `IEventLogWalker` as reports. To create a report, inject an `IEventLogWalker`.
 
 Example:
 
 ```c#
-public SimplestReport(IEventLogWalker walker)
+private readonly IEventLogWalker walker;
+
+public ExampleReport(IEventLogWalker walker)
 {
     this.walker = walker;
 }
 ```
 
-Then call `walker.WalkAsync(<WalkArgs>, <EventProcessor>)`.
+Call either:
+- `IEventLogWalkerStatus WalkAsync(WalkArgs args, Action<InsightEvent, IEventLogWalkerStatus> eventProcessor)`
+- `IEventLogWalkerStatus WalkAsync(WalkArgs args, Func<InsightEvent, IEventLogWalkerStatus, Task> eventProcessor)` 
 
-Example `WalkArgs` (using defaults):
-
-```c#
-new WalkArgs()
-```
-
-Example `WalkArgs` (specifiying optional properties):
-
-```c#
-new WalkArgs
-{
-    StartInclusive = DateTimeOffset.Parse("2021-06-01"),
-    EndExclusive = DateTimeOffset.Parse("2021-08-01")
-}
-```
-
-The `EventProcessor` is a function which can be synchronous `Action<InsightEvent, IEventLogWalkerStatus>` or asynchronous `Func<InsightEvent, IEventLogWalkerStatus, Task>`.
-
-Example call to `WalkAsync()`:
+Example call to `WalkAsync()` with default `args` and a synchronous `eventProcessor`:
 
 ```c#
 var finalStatus = await walker.WalkAsync(new WalkArgs(), (insightEvent, status) =>
@@ -54,7 +42,7 @@ var finalStatus = await walker.WalkAsync(new WalkArgs(), (insightEvent, status) 
 });
 ```
 
-The result of calling `WalkAsync()` is an `IEventLogWalkerStatus`. To know if `WalkAsync()` completed successfully check `IEventLogWalkerStatus.Exception`. If it is `null` the walk finished successfully. If it is not `null` then an error occured while walking the EventLog.
+The returned `IEventLogWalkerStatus.Exception` can be checked to determine whether `WalkAsync()` reached the end the event log for the range specified by `WalkArgs` or if an error occured. If `Exception` is `null` the walk finished successfully. If it is not `null` then an error occured.
 
 Example detection of an error:
 
@@ -66,15 +54,20 @@ if (finalStatus.Exception != null)
 }
 ```
 
-### API
+## API
 
-#### `WalkArgs`
+### `IEventLogWalker`
+Methods:
+- `IEventLogWalkerStatus WalkAsync(WalkArgs args, Action<InsightEvent, IEventLogWalkerStatus> eventProcessor)`: Used to process each `InsightEvent` synchronously, like when all state is stored only in memory.
+- `IEventLogWalkerStatus WalkAsync(WalkArgs args, Func<InsightEvent, IEventLogWalkerStatus, Task> eventProcessor)`: Used to process each `InsightEvent` asynchronously, like when writing to disk or a database.
+
+### `WalkArgs`
 Properties:
 - `StartInclusive`: The earliest (inclusive) InsightEvent to read. Default: `DateTimeOffset.MinValue`.
 - `EndExclusive`: The latest (exlusive) InsightEvent to read. Default: `DateTimeOffset.MaxValue` 
 - `ResumeToken`: The `string` returned by `IEventLogWalkerStatus.GetResumeToken()` from an earlier run.
 
-#### `IEventLogWalkerStatus`
+### `IEventLogWalkerStatus`
 The object `IEventLogWalkerStatus` is provided to the `EventProcessor` function and returned by `WalkAsync()`. It contains information which can be used to make decisions about logging and persisting state for resuming.
 
 Properties:
@@ -93,7 +86,19 @@ Properties:
 Methods:
 - `string GetResumeToken()`: Returns a resume token which can be passed to `WalkArgs.ResumeToken` to resume walking at the current event.
 
-### Resuming
+### `InsightEvent`
+Properties:
+- `Id`: Unique Id in the Insights product context, useful when troubleshooting issues with Insights.
+- `BrowserTimestamp`: When the browser thought the event occured
+- `ServerTimestamp`: When the server received the event. Use this as the true time of occurance.
+- `UserId`: Which user triggered the event.
+- `AccountId`: Which account the user belongs to.
+- `AuthSession`: Which session the user triggered the event during.
+- `EventType`: Name of the triggered event.
+- `Data`: JSON payload containing more information about the event.
+
+
+## Resuming
 
 Walking the EventLog can take hours to complete depending on the range of data specified in `WalkArgs`. Being able to resume after a failure or being able to stop and restart a walk can be very useful. Some things to keep in mind when enabling resuming:
 
