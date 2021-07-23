@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 
-namespace ExampleConsumers.Configuration
+namespace ExampleReports.Configuration
 {
     public static class DependencyInjectionConfig
     {

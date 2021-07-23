@@ -1,8 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExampleConsumers", "ExampleConsumers\ExampleConsumers.csproj", "{FA793F66-2C44-4B90-9CC5-6A9A05425BFB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExampleReports", "ExampleReports\ExampleReports.csproj", "{FA793F66-2C44-4B90-9CC5-6A9A05425BFB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExampleConsumers.Tests", "ExampleConsumers.Tests\ExampleConsumers.Tests.csproj", "{D9013C5D-0D9F-495C-A7BF-DC8A0A0C3A4A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExampleReports.UnitTests", "ExampleReports.UnitTests\ExampleReports.UnitTests.csproj", "{D9013C5D-0D9F-495C-A7BF-DC8A0A0C3A4A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Emmersion.EventLogWalker", "Emmersion.EventLogWalker\Emmersion.EventLogWalker.csproj", "{CF04D70B-32BF-43E8-981A-25F62088EFB9}"
 EndProject

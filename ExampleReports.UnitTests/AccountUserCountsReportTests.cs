@@ -7,7 +7,7 @@ using Emmersion.Testing;
 using Moq;
 using NUnit.Framework;
 
-namespace ExampleConsumers.Tests
+namespace ExampleReports.UnitTests
 {
     public class AccountUserCountsReportTests : With_an_automocked<AccountUserCountsReport>
     {

@@ -1,6 +1,6 @@
 ﻿using System.IO;
 
-namespace ExampleConsumers
+namespace ExampleReports
 {
     public interface IFileSystem
     {

@@ -3,18 +3,18 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Emmersion.EventLogWalker;
 
-namespace ExampleConsumers
+namespace ExampleReports
 {
-    public interface ISimplestReport
+    public interface ISimpleReport
     {
         Task GenerateAsync();
     }
 
-    public class SimplestReport : ISimplestReport
+    public class SimpleReport : ISimpleReport
     {
         private readonly IEventLogWalker walker;
 
-        public SimplestReport(IEventLogWalker walker)
+        public SimpleReport(IEventLogWalker walker)
         {
             this.walker = walker;
         }

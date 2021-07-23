@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Emmersion.EventLogWalker;
 
-namespace ExampleConsumers
+namespace ExampleReports
 {
     public interface IAccountUserCountsReport
     {
@@ -48,7 +48,7 @@ args =>
 
             var resumeToken = LoadState();
 
-            //  NOTE: See ExampleConsumers.Configuration.DependencyInjectionConfig to understand the package dependency needs
+            //  NOTE: See ExampleReports.Configuration.DependencyInjectionConfig to understand the package dependency needs
             var status = await eventLogWalker.WalkAsync(
                 new WalkArgs
                 {

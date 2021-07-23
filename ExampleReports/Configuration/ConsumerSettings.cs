@@ -4,7 +4,7 @@ using System.Reflection;
 using Emmersion.EventLogWalker.Configuration;
 using Microsoft.Extensions.Configuration;
 
-namespace ExampleConsumers.Configuration
+namespace ExampleReports.Configuration
 {
     public interface IConsumerSettings
     {

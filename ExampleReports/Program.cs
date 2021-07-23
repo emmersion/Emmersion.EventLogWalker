@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Threading.Tasks;
-using ExampleConsumers.Configuration;
+using ExampleReports.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace ExampleConsumers
+namespace ExampleReports
 {
     class Program
     {
@@ -29,7 +29,7 @@ namespace ExampleConsumers
         
         private static async Task SimpleReport(ServiceProvider services)
         {
-            var report = services.GetRequiredService<ISimplestReport>();
+            var report = services.GetRequiredService<ISimpleReport>();
 
             await report.GenerateAsync();
         }
