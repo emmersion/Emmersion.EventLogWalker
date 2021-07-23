@@ -334,8 +334,7 @@ namespace ExampleReports.UnitTests
             var stateJson = RandomString();
 
             var statusMock = GetMock<IEventLogWalkerStatus>();
-            statusMock.SetupGet(x => x.TotalEventsProcessed).Returns(1000);
-            statusMock.SetupGet(x => x.PageEventsCount).Returns(1000);
+            statusMock.SetupGet(x => x.PageStatus).Returns(PageStatus.Start);
             statusMock.Setup(x => x.GetResumeToken()).Returns(resumeToken);
 
             AccountUserCountsReportState capturedAccountUserCountsReportState = null;
