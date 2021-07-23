@@ -133,7 +133,7 @@ if (finalStatus.Exception != null)
 
 ## Example Reports
 The included `ExampleReports` project has a few examples of consuming `IEventLogWalker`. You can view them in GitHub here:
-- [SimpleReport](https://github.com/emmersion/Emmersion.EventLogWalker/blob/main/ExampleReport/SimpleReport.cs)
+- [SimpleReport](https://github.com/emmersion/Emmersion.EventLogWalker/blob/main/ExampleReports/SimpleReport.cs)
   - Bare minimum to get up and running.
   - Great as a template to copy and paste in order to get started.
 - [AccountUserCountsReport](https://github.com/emmersion/Emmersion.EventLogWalker/blob/main/ExampleReports/AccountUserCountsReport.cs)
