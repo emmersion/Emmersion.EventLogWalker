@@ -136,6 +136,6 @@ The included `ExampleReports` project has a few examples of consuming `IEventLog
 - [SimpleReport](https://github.com/emmersion/Emmersion.EventLogWalker/blob/main/ExampleReport/SimpleReport.cs)
   - Bare minimum to get up and running.
   - Great as a template to copy and paste in order to get started.
-- [AccountUserCountsReport](https://github.com/emmersion/Emmersion.EventLogWalker/blob/main/ExampleReport/AccountUserCountsReport.cs)
+- [AccountUserCountsReport](https://github.com/emmersion/Emmersion.EventLogWalker/blob/main/ExampleReports/AccountUserCountsReport.cs)
   - Supports resuming
   - Supports custom date ranges
