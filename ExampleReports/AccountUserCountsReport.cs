@@ -13,6 +13,8 @@ namespace ExampleReports
 
     public class AccountUserCountsReport : IAccountUserCountsReport
     {
+        public const string StateFilePath = "c:\\tmp\\Emmersion.EventLogWalker\\" + nameof(AccountUserCountsReport) + ".state.json";
+
         private readonly IEventLogWalker eventLogWalker;
         private readonly ICsvWriter csvWriter;
         private readonly IJsonSerializer jsonSerializer;
@@ -27,7 +29,7 @@ namespace ExampleReports
             this.jsonSerializer = jsonSerializer;
             this.fileSystem = fileSystem;
 
-            eventTimeTracker = new TimeTracker(1000);
+            eventTimeTracker = new TimeTracker(1);
         }
 
         public Dictionary<string, HashSet<Guid>> EventAccountCounts { get; set; } =
@@ -73,7 +75,7 @@ args =>
             var headerRow =
                 $"{nameof(EventCounts.EventType)},{nameof(EventCounts.DistinctAccounts)},{nameof(EventCounts.DistinctUsers)}";
             csvWriter.WriteAll(fileName, headerRow, eventCounts);
-            fileSystem.DeleteFile("Concept.state.json");
+            fileSystem.DeleteFile(StateFilePath);
         }
 
         private List<EventCounts> MapEventCounts()
@@ -90,15 +92,14 @@ args =>
 
         public void ProcessEvent(InsightEvent insightEvent, IEventLogWalkerStatus status)
         {
-            if (status.TotalEventsProcessed > 0 && status.TotalEventsProcessed % status.PageEventsCount == 0)
+            if (status.PageStatus == PageStatus.Start)
             {
                 PersistState(status.GetResumeToken());
+                eventTimeTracker.ItemCompleted($"Page number: {status.PageNumber}. TotalProcessedEvents: {status.TotalEventsProcessed}. ");
             }
 
             StoreDistinctAccounts(insightEvent);
             StoreDistinctUsers(insightEvent);
-
-            eventTimeTracker.ItemCompleted($"Page number: {status.PageNumber}. TotalProcessedEvents: {status.TotalEventsProcessed + 1}. ");
         }
 
         private void StoreDistinctAccounts(InsightEvent insightEvent)
@@ -125,29 +126,29 @@ args =>
             }
         }
 
-        private void PersistState(string data)
+        private void PersistState(string walkerResumeToken)
         {
-            var state = new ReportState
+            var state = new AccountUserCountsReportState
             {
-                WalkerResumeToken = data,
-                Accounts = EventAccountCounts,
-                Users = EventUserCounts
+                WalkerResumeToken = walkerResumeToken,
+                EventAccountCounts = EventAccountCounts,
+                EventUserCounts = EventUserCounts
             };
             var stateJson = jsonSerializer.Serialize(state);
-            fileSystem.WriteFile("Concept.state.json", stateJson);
+            fileSystem.WriteFile(StateFilePath, stateJson);
         }
 
         private string LoadState()
         {
-            var stateJson = fileSystem.ReadFile("Concept.state.json");
+            var stateJson = fileSystem.ReadFile(StateFilePath);
             if (string.IsNullOrEmpty(stateJson))
             {
                 return null;
             }
 
-            var state = jsonSerializer.Deserialize<ReportState>(stateJson);
-            EventAccountCounts = state.Accounts;
-            EventUserCounts = state.Users;
+            var state = jsonSerializer.Deserialize<AccountUserCountsReportState>(stateJson);
+            EventAccountCounts = state.EventAccountCounts;
+            EventUserCounts = state.EventUserCounts;
             return state.WalkerResumeToken;
         }
     }
@@ -164,10 +165,10 @@ args =>
         }
     }
 
-    public class ReportState
+    public class AccountUserCountsReportState
     {
         public string WalkerResumeToken { get; set; }
-        public Dictionary<string, HashSet<Guid>> Accounts { get; set; }
-        public Dictionary<string, HashSet<Guid>> Users { get; set; }
+        public Dictionary<string, HashSet<Guid>> EventAccountCounts { get; set; }
+        public Dictionary<string, HashSet<Guid>> EventUserCounts { get; set; }
     }
 }

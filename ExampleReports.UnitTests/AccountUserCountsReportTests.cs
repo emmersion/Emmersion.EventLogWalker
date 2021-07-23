@@ -41,7 +41,7 @@ namespace ExampleReports.UnitTests
                 }
             };
 
-            GetMock<IFileSystem>().Setup(x => x.ReadFile("Concept.state.json")).Returns((string)null);
+            GetMock<IFileSystem>().Setup(x => x.ReadFile(AccountUserCountsReport.StateFilePath)).Returns((string)null);
 
             string capturedFileName = null;
             string capturedHeaderRow = null;
@@ -66,7 +66,7 @@ namespace ExampleReports.UnitTests
 
             await ClassUnderTest.GenerateAsync(reportPeriodStartInclusive, reportPeriodEndExclusive);
 
-            GetMock<IFileSystem>().Verify(x => x.DeleteFile("Concept.state.json"));
+            GetMock<IFileSystem>().Verify(x => x.DeleteFile(AccountUserCountsReport.StateFilePath));
 
             Assert.That(capturedWalkArgs.StartInclusive, Is.EqualTo(reportPeriodStartInclusive));
             Assert.That(capturedWalkArgs.EndExclusive, Is.EqualTo(reportPeriodEndExclusive));
@@ -90,16 +90,16 @@ namespace ExampleReports.UnitTests
         {
             var reportPeriodStartInclusive = DateTimeOffset.UtcNow.AddDays(-7);
             var reportPeriodEndExclusive = DateTimeOffset.UtcNow;
-            var reportState = new ReportState
+            var reportState = new AccountUserCountsReportState
             {
-                Accounts = new Dictionary<string, HashSet<Guid>>(),
-                Users = new Dictionary<string, HashSet<Guid>>(),
+                EventAccountCounts = new Dictionary<string, HashSet<Guid>>(),
+                EventUserCounts = new Dictionary<string, HashSet<Guid>>(),
                 WalkerResumeToken = RandomString()
             };
             var stateJson = RandomString();
 
-            GetMock<IFileSystem>().Setup(x => x.ReadFile("Concept.state.json")).Returns(stateJson);
-            GetMock<IJsonSerializer>().Setup(x => x.Deserialize<ReportState>(stateJson)).Returns(reportState);
+            GetMock<IFileSystem>().Setup(x => x.ReadFile(AccountUserCountsReport.StateFilePath)).Returns(stateJson);
+            GetMock<IJsonSerializer>().Setup(x => x.Deserialize<AccountUserCountsReportState>(stateJson)).Returns(reportState);
 
             WalkArgs capturedWalkArgs = null;
             GetMock<IEventLogWalker>().Setup(x => x.WalkAsync(IsAny<WalkArgs>(), IsAny<Action<InsightEvent, IEventLogWalkerStatus>>()))
@@ -108,8 +108,8 @@ namespace ExampleReports.UnitTests
 
             await ClassUnderTest.GenerateAsync(reportPeriodStartInclusive, reportPeriodEndExclusive);
 
-            Assert.That(ClassUnderTest.EventAccountCounts, Is.SameAs(reportState.Accounts));
-            Assert.That(ClassUnderTest.EventUserCounts, Is.SameAs(reportState.Users));
+            Assert.That(ClassUnderTest.EventAccountCounts, Is.SameAs(reportState.EventAccountCounts));
+            Assert.That(ClassUnderTest.EventUserCounts, Is.SameAs(reportState.EventUserCounts));
             Assert.That(capturedWalkArgs.StartInclusive, Is.EqualTo(reportPeriodStartInclusive));
             Assert.That(capturedWalkArgs.EndExclusive, Is.EqualTo(reportPeriodEndExclusive));
             Assert.That(capturedWalkArgs.ResumeToken, Is.EqualTo(reportState.WalkerResumeToken));
@@ -129,9 +129,9 @@ namespace ExampleReports.UnitTests
             statusMock.SetupGet(x => x.Exception).Returns(exception);
             statusMock.Setup(x => x.GetResumeToken()).Returns(resumeToken);
 
-            ReportState capturedReportState = null;
-            GetMock<IJsonSerializer>().Setup(x => x.Serialize(IsAny<ReportState>()))
-                .Callback<ReportState>(reportState => capturedReportState = reportState)
+            AccountUserCountsReportState capturedAccountUserCountsReportState = null;
+            GetMock<IJsonSerializer>().Setup(x => x.Serialize(IsAny<AccountUserCountsReportState>()))
+                .Callback<AccountUserCountsReportState>(reportState => capturedAccountUserCountsReportState = reportState)
                 .Returns(stateJson);
 
             GetMock<IEventLogWalker>().Setup(x => x.WalkAsync(IsAny<WalkArgs>(), IsAny<Action<InsightEvent, IEventLogWalkerStatus>>()))
@@ -140,11 +140,11 @@ namespace ExampleReports.UnitTests
             await ClassUnderTest.GenerateAsync(reportPeriodStartInclusive, reportPeriodEndExclusive);
 
             GetMock<ICsvWriter>().VerifyNever(x => x.WriteAll(IsAny<string>(), IsAny<string>(), IsAny<List<EventCounts>>()));
-            GetMock<IFileSystem>().Verify(x => x.WriteFile("Concept.state.json", stateJson));
+            GetMock<IFileSystem>().Verify(x => x.WriteFile(AccountUserCountsReport.StateFilePath, stateJson));
 
-            Assert.That(capturedReportState.Accounts, Is.SameAs(ClassUnderTest.EventAccountCounts));
-            Assert.That(capturedReportState.Users, Is.SameAs(ClassUnderTest.EventUserCounts));
-            Assert.That(capturedReportState.WalkerResumeToken, Is.EqualTo(resumeToken));
+            Assert.That(capturedAccountUserCountsReportState.EventAccountCounts, Is.SameAs(ClassUnderTest.EventAccountCounts));
+            Assert.That(capturedAccountUserCountsReportState.EventUserCounts, Is.SameAs(ClassUnderTest.EventUserCounts));
+            Assert.That(capturedAccountUserCountsReportState.WalkerResumeToken, Is.EqualTo(resumeToken));
         }
 
         [Test]
@@ -338,18 +338,18 @@ namespace ExampleReports.UnitTests
             statusMock.SetupGet(x => x.PageEventsCount).Returns(1000);
             statusMock.Setup(x => x.GetResumeToken()).Returns(resumeToken);
 
-            ReportState capturedReportState = null;
-            GetMock<IJsonSerializer>().Setup(x => x.Serialize(IsAny<ReportState>()))
-                .Callback<ReportState>(reportState => capturedReportState = reportState)
+            AccountUserCountsReportState capturedAccountUserCountsReportState = null;
+            GetMock<IJsonSerializer>().Setup(x => x.Serialize(IsAny<AccountUserCountsReportState>()))
+                .Callback<AccountUserCountsReportState>(reportState => capturedAccountUserCountsReportState = reportState)
                 .Returns(stateJson);
 
             ClassUnderTest.ProcessEvent(insightEvent1,statusMock.Object);
 
-            GetMock<IFileSystem>().Verify(x => x.WriteFile("Concept.state.json", stateJson));
+            GetMock<IFileSystem>().Verify(x => x.WriteFile(AccountUserCountsReport.StateFilePath, stateJson));
 
-            Assert.That(capturedReportState.Accounts, Is.SameAs(ClassUnderTest.EventAccountCounts));
-            Assert.That(capturedReportState.Users, Is.SameAs(ClassUnderTest.EventUserCounts));
-            Assert.That(capturedReportState.WalkerResumeToken, Is.EqualTo(resumeToken));
+            Assert.That(capturedAccountUserCountsReportState.EventAccountCounts, Is.SameAs(ClassUnderTest.EventAccountCounts));
+            Assert.That(capturedAccountUserCountsReportState.EventUserCounts, Is.SameAs(ClassUnderTest.EventUserCounts));
+            Assert.That(capturedAccountUserCountsReportState.WalkerResumeToken, Is.EqualTo(resumeToken));
         }
 
         [Test]
@@ -368,7 +368,7 @@ namespace ExampleReports.UnitTests
             ClassUnderTest.ProcessEvent(insightEvent1,statusMock.Object);
 
             statusMock.VerifyNever(x => x.GetResumeToken());
-            GetMock<IJsonSerializer>().VerifyNever(x => x.Serialize(IsAny<ReportState>()));
+            GetMock<IJsonSerializer>().VerifyNever(x => x.Serialize(IsAny<AccountUserCountsReportState>()));
             GetMock<IFileSystem>().VerifyNever(x => x.WriteFile(IsAny<string>(), IsAny<string>()));
         }
 

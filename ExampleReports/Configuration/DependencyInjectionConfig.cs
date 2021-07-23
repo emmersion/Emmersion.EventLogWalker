@@ -16,10 +16,10 @@ namespace ExampleReports.Configuration
             //REQUIRED: Must call
             Emmersion.EventLogWalker.Configuration.DependencyInjectionConfig.ConfigureServices(services);
 
-            services.AddSingleton<IConsumerSettings, ConsumerSettings>();
+            services.AddSingleton<IExampleReportsSettings, ExampleReportsSettings>();
 
             //REQUIRED: Must implement and register IInsightsSystemApiSettings
-            services.AddSingleton(x => x.GetRequiredService<IConsumerSettings>().InsightsSystemApiSettings);
+            services.AddSingleton(x => x.GetRequiredService<IExampleReportsSettings>().InsightsSystemApiSettings);
         }
     }
 }

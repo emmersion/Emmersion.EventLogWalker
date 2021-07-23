@@ -77,6 +77,7 @@ namespace Emmersion.EventLogWalker
                     return new WalkState
                     {
                         Cursor = null,
+                        PreviousCursor = previousState.PreviousCursor,
                         Events = new List<InsightEvent>(),
                         PageEventIndex = 0,
                         PageNumber = previousState.PageNumber + 1,
@@ -92,6 +93,7 @@ namespace Emmersion.EventLogWalker
                 {
                     PageEventIndex = previousState.PageEventIndex,
                     Cursor = previousState.Cursor,
+                    PreviousCursor = previousState.PreviousCursor,
                     Events = previousState.Events,
                     PageNumber = previousState.PageNumber,
                     TotalEventsProcessed = previousState.TotalEventsProcessed,
@@ -107,6 +109,7 @@ namespace Emmersion.EventLogWalker
             return new WalkState
             {
                 Cursor = page.NextPage,
+                PreviousCursor = previousState.Cursor,
                 Events = page.Events,
                 PageEventIndex = 0,
                 PageNumber = previousState.PageNumber + 1,

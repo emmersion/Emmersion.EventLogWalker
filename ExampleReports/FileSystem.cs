@@ -25,6 +25,9 @@ namespace ExampleReports
 
         public void WriteFile(string fileName, string data)
         {
+            var dir = Path.GetDirectoryName(fileName);
+            Directory.CreateDirectory(dir);
+
             File.WriteAllText(fileName, data);
         }
 

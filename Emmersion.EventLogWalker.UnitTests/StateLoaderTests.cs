@@ -186,7 +186,8 @@ namespace Emmersion.EventLogWalker.UnitTests
                     new InsightEvent(),
                     new InsightEvent()
                 },
-                Cursor = new Cursor()
+                Cursor = new Cursor(),
+                PreviousCursor = new Cursor()
             };
             var page = new Page
             {
@@ -204,6 +205,7 @@ namespace Emmersion.EventLogWalker.UnitTests
             var state = await ClassUnderTest.LoadNextStateAsync(previousState);
 
             Assert.That(state.Cursor, Is.EqualTo(page.NextPage));
+            Assert.That(state.PreviousCursor, Is.EqualTo(previousState.Cursor));
             Assert.That(state.Events, Is.EqualTo(page.Events));
             Assert.That(state.PageEventIndex, Is.EqualTo(0));
             Assert.That(state.PageNumber, Is.EqualTo(previousState.PageNumber + 1));
@@ -222,7 +224,8 @@ namespace Emmersion.EventLogWalker.UnitTests
                     new InsightEvent(),
                     new InsightEvent()
                 },
-                Cursor = null
+                Cursor = null,
+                PreviousCursor = new Cursor()
             };
             
             var state = await ClassUnderTest.LoadNextStateAsync(previousState);
@@ -230,6 +233,7 @@ namespace Emmersion.EventLogWalker.UnitTests
             GetMock<IInsightsSystemApi>().VerifyNever(x => x.GetPageAsync(IsAny<Cursor>()));
 
             Assert.That(state.Cursor, Is.Null);
+            Assert.That(state.PreviousCursor, Is.EqualTo(previousState.PreviousCursor));
             Assert.That(state.Events, Is.Empty);
             Assert.That(state.PageEventIndex, Is.EqualTo(0));
             Assert.That(state.PageNumber, Is.EqualTo(previousState.PageNumber + 1));
@@ -249,6 +253,7 @@ namespace Emmersion.EventLogWalker.UnitTests
                     new InsightEvent()
                 },
                 Cursor = new Cursor(),
+                PreviousCursor = new Cursor()
             };
             var exception = new Exception(RandomString());
 
@@ -259,6 +264,7 @@ namespace Emmersion.EventLogWalker.UnitTests
 
             Assert.That(state.Exception, Is.EqualTo(exception));
             Assert.That(state.Cursor, Is.EqualTo(previousState.Cursor));
+            Assert.That(state.PreviousCursor, Is.EqualTo(previousState.PreviousCursor));
             Assert.That(state.Events, Is.EqualTo(previousState.Events));
             Assert.That(state.PageEventIndex, Is.EqualTo(previousState.PageEventIndex));
             Assert.That(state.PageNumber, Is.EqualTo(previousState.PageNumber));

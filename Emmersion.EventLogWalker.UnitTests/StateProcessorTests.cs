@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Threading.Tasks;
 using Emmersion.Testing;
 using NUnit.Framework;
@@ -21,6 +22,7 @@ namespace Emmersion.EventLogWalker.UnitTests
                     new InsightEvent()
                 },
                 Cursor = new Cursor(),
+                PreviousCursor = new Cursor(),
                 TotalEventsProcessed = 0,
                 PageEventIndex = 0
             };
@@ -44,11 +46,13 @@ namespace Emmersion.EventLogWalker.UnitTests
             Assert.That(capturedStatus1.TotalEventsProcessed, Is.EqualTo(0));
             Assert.That(capturedStatus1.PageEventsCount, Is.EqualTo(initialState.Events.Count));
             Assert.That(capturedStatus1.PageStatus, Is.EqualTo(PageStatus.Start));
+            Assert.That(GetPrivateStateOfStatus(capturedStatus1).PreviousCursor, Is.EqualTo(initialState.PreviousCursor));
 
             Assert.That(capturedStatus2.PageEventIndex, Is.EqualTo(1));
             Assert.That(capturedStatus2.PageNumber, Is.EqualTo(initialState.PageNumber));
             Assert.That(capturedStatus2.TotalEventsProcessed, Is.EqualTo(1));
             Assert.That(capturedStatus2.PageEventsCount, Is.EqualTo(initialState.Events.Count));
+            Assert.That(GetPrivateStateOfStatus(capturedStatus2).PreviousCursor, Is.EqualTo(initialState.PreviousCursor));
 
             Assert.That(finalState.Exception, Is.Null);
             Assert.That(finalState.PageEventIndex, Is.EqualTo(initialState.Events.Count));
@@ -56,6 +60,7 @@ namespace Emmersion.EventLogWalker.UnitTests
             Assert.That(finalState.PageNumber, Is.EqualTo(initialState.PageNumber));
             Assert.That(finalState.Events, Is.EqualTo(initialState.Events));
             Assert.That(finalState.Cursor, Is.EqualTo(initialState.Cursor));
+            Assert.That(finalState.PreviousCursor, Is.EqualTo(initialState.PreviousCursor));
         }
 
         [Test]
@@ -70,6 +75,7 @@ namespace Emmersion.EventLogWalker.UnitTests
                 },
                 PageNumber = 2,
                 Cursor = new Cursor(),
+                PreviousCursor = new Cursor(),
                 PageEventIndex = 1,
                 TotalEventsProcessed = 3
             };
@@ -83,17 +89,14 @@ namespace Emmersion.EventLogWalker.UnitTests
             var finalState =
                 await ClassUnderTest.ProcessStateAsync(mockEventProcessor.Object, initialState);
 
-            Assert.That(capturedStatus.PageEventIndex, Is.EqualTo(1));
+            Assert.That(capturedStatus.PageEventIndex, Is.EqualTo(initialState.PageEventIndex));
             Assert.That(capturedStatus.PageNumber, Is.EqualTo(initialState.PageNumber));
-            Assert.That(capturedStatus.TotalEventsProcessed, Is.EqualTo(3));
+            Assert.That(capturedStatus.TotalEventsProcessed, Is.EqualTo(initialState.TotalEventsProcessed));
             Assert.That(capturedStatus.PageEventsCount, Is.EqualTo(initialState.Events.Count));
 
-            Assert.That(finalState.Exception, Is.Null);
             Assert.That(finalState.PageEventIndex, Is.EqualTo(initialState.Events.Count));
             Assert.That(finalState.TotalEventsProcessed, Is.EqualTo(4));
             Assert.That(finalState.PageNumber, Is.EqualTo(initialState.PageNumber));
-            Assert.That(finalState.Events, Is.EqualTo(initialState.Events));
-            Assert.That(finalState.Cursor, Is.EqualTo(initialState.Cursor));
         }
 
         [Test]
@@ -108,6 +111,7 @@ namespace Emmersion.EventLogWalker.UnitTests
                     new InsightEvent()
                 },
                 Cursor = new Cursor(),
+                PreviousCursor = new Cursor(),
                 PageEventIndex = 0
             };
 
@@ -131,6 +135,14 @@ namespace Emmersion.EventLogWalker.UnitTests
             Assert.That(finalState.PageNumber, Is.EqualTo(initialState.PageNumber));
             Assert.That(finalState.Events, Is.EqualTo(initialState.Events));
             Assert.That(finalState.Cursor, Is.EqualTo(initialState.Cursor));
+            Assert.That(finalState.PreviousCursor, Is.EqualTo(initialState.PreviousCursor));
+        }
+
+        private WalkState GetPrivateStateOfStatus(IEventLogWalkerStatus status)
+        {
+            var stateFieldInfo = typeof(EventLogWalkerStatus).GetField("state", BindingFlags.Instance | BindingFlags.NonPublic);
+
+            return (WalkState)stateFieldInfo!.GetValue(status);
         }
     }
 }

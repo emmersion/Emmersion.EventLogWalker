@@ -13,6 +13,7 @@ namespace ExampleReports
 
             await ComplexReport(services);
             //await SimpleReport(services);
+            //await ResumeValidationReport(services);
         }
 
         private static async Task ComplexReport(ServiceProvider services)
@@ -30,6 +31,13 @@ namespace ExampleReports
         private static async Task SimpleReport(ServiceProvider services)
         {
             var report = services.GetRequiredService<ISimpleReport>();
+
+            await report.GenerateAsync();
+        }
+
+        private static async Task ResumeValidationReport(ServiceProvider services)
+        {
+            var report = services.GetRequiredService<IResumeValidationReport>();
 
             await report.GenerateAsync();
         }

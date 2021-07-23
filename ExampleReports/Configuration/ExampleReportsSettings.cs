@@ -6,17 +6,17 @@ using Microsoft.Extensions.Configuration;
 
 namespace ExampleReports.Configuration
 {
-    public interface IConsumerSettings
+    public interface IExampleReportsSettings
     {
         IInsightsSystemApiSettings InsightsSystemApiSettings { get; }
     }
 
-    public class ConsumerSettings : IConsumerSettings
+    public class ExampleReportsSettings : IExampleReportsSettings
     {
-        private static readonly string assemblyName = Assembly.GetAssembly(typeof(ConsumerSettings)).GetName().Name;
+        private static readonly string assemblyName = Assembly.GetAssembly(typeof(ExampleReportsSettings)).GetName().Name;
         private readonly IConfigurationRoot configurationRoot;
 
-        public ConsumerSettings()
+        public ExampleReportsSettings()
         {
             var localConfigOverridesPath =
                 Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),

@@ -29,6 +29,7 @@ namespace Emmersion.EventLogWalker
                     {
                         Events = state.Events,
                         Cursor = state.Cursor,
+                        PreviousCursor = state.PreviousCursor,
                         PageNumber = state.PageNumber,
                         PageEventIndex = i,
                         TotalEventsProcessed = state.TotalEventsProcessed + processedEvents
@@ -43,6 +44,7 @@ namespace Emmersion.EventLogWalker
                     {
                         Events = walkStateInProgress.Events,
                         Cursor = walkStateInProgress.Cursor,
+                        PreviousCursor = walkStateInProgress.PreviousCursor,
                         PageNumber = walkStateInProgress.PageNumber,
                         PageEventIndex = walkStateInProgress.PageEventIndex,
                         TotalEventsProcessed = walkStateInProgress.TotalEventsProcessed,
@@ -55,6 +57,7 @@ namespace Emmersion.EventLogWalker
             {
                 Events = state.Events,
                 Cursor = state.Cursor,
+                PreviousCursor = state.PreviousCursor,
                 PageNumber = state.PageNumber,
                 PageEventIndex = state.Events.Count,
                 TotalEventsProcessed = state.TotalEventsProcessed + processedEvents
