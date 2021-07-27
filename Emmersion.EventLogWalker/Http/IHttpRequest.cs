@@ -1,10 +1,9 @@
 ﻿using System.Net.Http;
 
-namespace Emmersion.Http
+namespace Emmersion.EventLogWalker.Http
 {
     public interface IHttpRequest
     {
-        HttpMethod Method { get; set; }
         string Url { get; set; }
         HttpHeaders Headers { get; set; }
 

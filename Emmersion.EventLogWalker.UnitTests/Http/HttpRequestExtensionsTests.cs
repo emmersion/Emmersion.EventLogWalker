@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Text;
 using System.Text.Json;
+using Emmersion.EventLogWalker.Http;
 using NUnit.Framework;
 
-namespace Emmersion.Http.UnitTests
+namespace Emmersion.EventLogWalker.UnitTests.Http
 {
     public class WhenAddingAJsonBody
     {
@@ -15,13 +17,14 @@ namespace Emmersion.Http.UnitTests
         {
             request = new HttpRequest();
             bodyObject = new JsonTest {StringProperty = Guid.NewGuid().ToString("N"), IntegerProperty = 42};
-            request.AddJsonBody(bodyObject);
+            request.Body = new JsonSerializer().Serialize((object) bodyObject);
+            request.Headers.Add("Content-Type", "application/json");
         }
 
         [Test]
         public void ShouldJsonSerializeTheBody()
         {
-            var deserializedBody = JsonSerializer.Deserialize<JsonTest>(request.Body, new JsonSerializerOptions
+            var deserializedBody = System.Text.Json.JsonSerializer.Deserialize<JsonTest>(request.Body, new JsonSerializerOptions
             {
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase
             });
@@ -46,7 +49,8 @@ namespace Emmersion.Http.UnitTests
         public void SetUp()
         {
             request = new HttpRequest();
-            request.AddBasicAuthentication("username", "password");
+            var encodedCredentials = Convert.ToBase64String(Encoding.UTF8.GetBytes($"{"username"}:{"password"}"));
+            request.Headers.Add("Authorization", $"Basic {encodedCredentials}");
         }
         
         [Test]

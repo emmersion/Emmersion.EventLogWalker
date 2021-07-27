@@ -1,4 +1,4 @@
-﻿namespace Emmersion.Http.UnitTests
+﻿namespace Emmersion.EventLogWalker.UnitTests.Http
 {
     public class JsonTest
     {

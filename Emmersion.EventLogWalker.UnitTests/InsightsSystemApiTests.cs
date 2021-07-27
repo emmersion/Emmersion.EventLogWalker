@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Emmersion.EventLogWalker.Configuration;
-using Emmersion.Http;
+using Emmersion.EventLogWalker.Http;
 using Emmersion.Testing;
 using Moq;
 using NUnit.Framework;
@@ -24,7 +24,7 @@ namespace Emmersion.EventLogWalker.UnitTests
 
             GetMock<IInsightsSystemApiSettings>().SetupGet(x => x.BaseUrl).Returns(insightsSystemApiBaseUrl);
             GetMock<IInsightsSystemApiSettings>().SetupGet(x => x.ApiKey).Returns(insightsSystemApiApiKey);
-            GetMock<IHttpClient>().Setup(x => x.ExecuteAsync(IsAny<IHttpRequest>()))
+            GetMock<IHttpClient>().Setup(x => x.ExecutePostAsync(IsAny<IHttpRequest>()))
                 .Callback<IHttpRequest>(httpRequest => capturedHttpRequest = httpRequest as HttpRequest)
                 .ReturnsAsync(new HttpResponse(200, new HttpHeaders(), serializedApiPage));
             GetMock<IJsonSerializer>().Setup(x => x.Deserialize<Page>(serializedApiPage)).Returns(expectedPage);
@@ -33,7 +33,6 @@ namespace Emmersion.EventLogWalker.UnitTests
             var page = await ClassUnderTest.GetPageAsync(cursor);
 
             Assert.That(capturedHttpRequest, Is.Not.Null);
-            Assert.That(capturedHttpRequest.Method, Is.EqualTo(HttpMethod.POST));
             Assert.That(capturedHttpRequest.Url, Is.EqualTo($"{insightsSystemApiBaseUrl}/event-log/page"));
             Assert.That(capturedHttpRequest.Headers.Exists("Authorization"), Is.True);
             Assert.That(capturedHttpRequest.Headers.GetValue("Authorization"), Is.EqualTo($"Bearer {insightsSystemApiApiKey}"));
@@ -52,7 +51,7 @@ namespace Emmersion.EventLogWalker.UnitTests
             var non200StatusCode = 400;
 
             GetMock<IInsightsSystemApiSettings>().SetupGet(x => x.BaseUrl).Returns(insightsSystemApiBaseUrl);
-            GetMock<IHttpClient>().Setup(x => x.ExecuteAsync(IsAny<IHttpRequest>()))
+            GetMock<IHttpClient>().Setup(x => x.ExecutePostAsync(IsAny<IHttpRequest>()))
                 .ReturnsAsync(new HttpResponse(non200StatusCode, new HttpHeaders(), ""));
             GetMock<IJsonSerializer>().Setup(x => x.Serialize(cursor)).Returns(cursorJson);
 
@@ -71,7 +70,7 @@ namespace Emmersion.EventLogWalker.UnitTests
             var notAuthorizedStatusCode = 403;
 
             GetMock<IInsightsSystemApiSettings>().SetupGet(x => x.BaseUrl).Returns(insightsSystemApiBaseUrl);
-            GetMock<IHttpClient>().Setup(x => x.ExecuteAsync(IsAny<IHttpRequest>()))
+            GetMock<IHttpClient>().Setup(x => x.ExecutePostAsync(IsAny<IHttpRequest>()))
                 .ReturnsAsync(new HttpResponse(notAuthorizedStatusCode, new HttpHeaders(), ""));
             GetMock<IJsonSerializer>().Setup(x => x.Serialize(cursor)).Returns(cursorJson);
 

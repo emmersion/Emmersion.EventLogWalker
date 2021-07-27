@@ -8,13 +8,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Emmersion.EventLogWalker", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Emmersion.EventLogWalker.UnitTests", "Emmersion.EventLogWalker.UnitTests\Emmersion.EventLogWalker.UnitTests.csproj", "{2812E91D-6E53-4F6F-B9D1-733AF0E7A9F2}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Emmersion.Http", "Emmersion.Http", "{2FF545A4-4E63-4FF5-AA1E-BD8E8C4988EC}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Emmersion.Http", "Emmersion.Http\Emmersion.Http\Emmersion.Http.csproj", "{42579BF6-6D91-4562-9967-5C7EE4532C9C}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Emmersion.Http.IntegrationTests", "Emmersion.Http\Emmersion.Http.IntegrationTests\Emmersion.Http.IntegrationTests.csproj", "{4CCD2E11-FEAB-451C-AD61-B407FFCB2414}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Emmersion.Http.UnitTests", "Emmersion.Http\Emmersion.Http.UnitTests\Emmersion.Http.UnitTests.csproj", "{DD8B6F0C-9762-4319-8550-FD8923C6EA8F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Emmersion.EventLogWalker.IntegrationTests", "Emmersion.EventLogWalker.IntegrationTests\Emmersion.EventLogWalker.IntegrationTests.csproj", "{ABC8674A-A8C6-4640-941B-52D4F9CAB8DD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -38,22 +32,11 @@ Global
 		{2812E91D-6E53-4F6F-B9D1-733AF0E7A9F2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2812E91D-6E53-4F6F-B9D1-733AF0E7A9F2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2812E91D-6E53-4F6F-B9D1-733AF0E7A9F2}.Release|Any CPU.Build.0 = Release|Any CPU
-		{42579BF6-6D91-4562-9967-5C7EE4532C9C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{42579BF6-6D91-4562-9967-5C7EE4532C9C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{42579BF6-6D91-4562-9967-5C7EE4532C9C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{42579BF6-6D91-4562-9967-5C7EE4532C9C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{4CCD2E11-FEAB-451C-AD61-B407FFCB2414}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4CCD2E11-FEAB-451C-AD61-B407FFCB2414}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4CCD2E11-FEAB-451C-AD61-B407FFCB2414}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4CCD2E11-FEAB-451C-AD61-B407FFCB2414}.Release|Any CPU.Build.0 = Release|Any CPU
-		{DD8B6F0C-9762-4319-8550-FD8923C6EA8F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{DD8B6F0C-9762-4319-8550-FD8923C6EA8F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{DD8B6F0C-9762-4319-8550-FD8923C6EA8F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{DD8B6F0C-9762-4319-8550-FD8923C6EA8F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ABC8674A-A8C6-4640-941B-52D4F9CAB8DD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ABC8674A-A8C6-4640-941B-52D4F9CAB8DD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ABC8674A-A8C6-4640-941B-52D4F9CAB8DD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ABC8674A-A8C6-4640-941B-52D4F9CAB8DD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{42579BF6-6D91-4562-9967-5C7EE4532C9C} = {2FF545A4-4E63-4FF5-AA1E-BD8E8C4988EC}
-		{4CCD2E11-FEAB-451C-AD61-B407FFCB2414} = {2FF545A4-4E63-4FF5-AA1E-BD8E8C4988EC}
-		{DD8B6F0C-9762-4319-8550-FD8923C6EA8F} = {2FF545A4-4E63-4FF5-AA1E-BD8E8C4988EC}
 	EndGlobalSection
 EndGlobal

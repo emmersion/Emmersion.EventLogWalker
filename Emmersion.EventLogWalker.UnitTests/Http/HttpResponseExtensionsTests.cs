@@ -1,6 +1,7 @@
+using Emmersion.EventLogWalker.Http;
 using NUnit.Framework;
 
-namespace Emmersion.Http.UnitTests
+namespace Emmersion.EventLogWalker.UnitTests.Http
 {
     public class WhenDeserializingAJsonResponse
     {
@@ -12,7 +13,7 @@ namespace Emmersion.Http.UnitTests
         {
             var json = "{\"stringProperty\":\"hello world\",\"IntegerProperty\":123}";
             response = new HttpResponse(200, new HttpHeaders(), json);
-            deserialized = response.DeserializeJsonBody<JsonTest>();
+            deserialized = new JsonSerializer().Deserialize<JsonTest>(response.Body);
         }
 
         [Test]

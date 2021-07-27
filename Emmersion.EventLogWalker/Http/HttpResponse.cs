@@ -1,4 +1,4 @@
-﻿namespace Emmersion.Http
+﻿namespace Emmersion.EventLogWalker.Http
 {
     public class HttpResponse
     {

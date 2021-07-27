@@ -49,8 +49,8 @@ namespace Emmersion.EventLogWalker
                 {
                     break;
                 }
-                resourceThrottle.WaitForNextAccess();
 
+                resourceThrottle.WaitForNextAccess();
                 state = await stateLoader.LoadNextStateAsync(state);
             }
 

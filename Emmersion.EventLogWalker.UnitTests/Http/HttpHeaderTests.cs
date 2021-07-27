@@ -1,6 +1,7 @@
-﻿using NUnit.Framework;
+﻿using Emmersion.EventLogWalker.Http;
+using NUnit.Framework;
 
-namespace Emmersion.Http.UnitTests
+namespace Emmersion.EventLogWalker.UnitTests.Http
 {
     public class WhenAddingAHeader
     {

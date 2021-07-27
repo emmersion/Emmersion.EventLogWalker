@@ -20,11 +20,9 @@ namespace ExampleReports
         {
             var report = services.GetRequiredService<IAccountUserCountsReport>();
 
-            // var startInclusive = DateTimeOffset.Parse("2021-06-01");
-            // var maxEndExclusive = DateTimeOffset.Parse("2021-08-01");
-            var startInclusive = DateTimeOffset.MinValue;
-            var maxEndExclusive = DateTimeOffset.MaxValue;
-            
+            var startInclusive = DateTimeOffset.Parse("2021-06-01");
+            var maxEndExclusive = DateTimeOffset.Parse("2021-07-01");
+
             await report.GenerateAsync(startInclusive, maxEndExclusive);
         }
         

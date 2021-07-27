@@ -1,7 +1,7 @@
 ﻿using System.Net.Http;
 using System.Text;
 
-namespace Emmersion.Http
+namespace Emmersion.EventLogWalker.Http
 {
     public class HttpRequest : IHttpRequest
     {
@@ -10,7 +10,6 @@ namespace Emmersion.Http
             Headers = new HttpHeaders();
         }
 
-        public HttpMethod Method { get; set; }
         public string Url { get; set; }
         public HttpHeaders Headers { get; set; }
         public string Body { get; set; }

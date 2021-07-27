@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Reflection;
 using Emmersion.EventLogWalker.Configuration;
 using Microsoft.Extensions.Configuration;
 
@@ -13,7 +12,6 @@ namespace ExampleReports.Configuration
 
     public class ExampleReportsSettings : IExampleReportsSettings
     {
-        private static readonly string assemblyName = Assembly.GetAssembly(typeof(ExampleReportsSettings)).GetName().Name;
         private readonly IConfigurationRoot configurationRoot;
 
         public ExampleReportsSettings()

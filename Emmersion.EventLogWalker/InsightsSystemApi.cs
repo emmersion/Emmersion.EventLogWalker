@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Emmersion.EventLogWalker.Configuration;
-using Emmersion.Http;
+using Emmersion.EventLogWalker.Http;
 
 namespace Emmersion.EventLogWalker
 {
@@ -30,14 +30,13 @@ namespace Emmersion.EventLogWalker
         {
             var request = new HttpRequest
             {
-                Method = HttpMethod.POST,
                 Url = $"{insightsSystemApiSettings.BaseUrl}/event-log/page",
                 Headers = new HttpHeaders().Add("Authorization", $"Bearer {insightsSystemApiSettings.ApiKey}")
                     .Add("Content-Type", "application/json"),
                 Body = jsonSerializer.Serialize(cursor)
             };
 
-            var response = await httpClient.ExecuteAsync(request);
+            var response = await httpClient.ExecutePostAsync(request);
 
             return response.StatusCode switch
             {

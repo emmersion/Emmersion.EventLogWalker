@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Emmersion.EventLogWalker.Http;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Emmersion.EventLogWalker.Configuration
 {
@@ -13,7 +14,8 @@ namespace Emmersion.EventLogWalker.Configuration
                 }
             );
 
-            Emmersion.Http.DependencyInjectionConfig.ConfigureServices(services);
+            services.AddSingleton<IHttpClient, HttpClient>();
+
         }
     }
 }
