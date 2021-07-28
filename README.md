@@ -14,6 +14,8 @@ You must also provide and register implementations for:
 
 - `IInsightsSystemApiSettings`
 
+*NOTE:* In order to obtain the required Insights System Api key you will need to reach out to the Strategic Solutions Team.
+
 ## Getting started
 
 This documentation will refer to consumers of `IEventLogWalker` as reports. To create a report, inject an `IEventLogWalker`.
@@ -58,8 +60,8 @@ if (finalStatus.Exception != null)
 
 ### `IEventLogWalker`
 Methods:
-- `Task<IEventLogWalkerStatus> WalkAsync(WalkArgs args, Action<InsightEvent, IEventLogWalkerStatus> eventProcessor)`: Use this to process each `InsightEvent` synchronously, like when all state is stored only in memory.
-- `Task<IEventLogWalkerStatus> WalkAsync(WalkArgs args, Func<InsightEvent, IEventLogWalkerStatus, Task> eventProcessor)`: Use this to process each `InsightEvent` asynchronously, like when writing to disk or a database.
+- `Task<IEventLogWalkerStatus> WalkAsync(WalkArgs args, Action<InsightEvent, IEventLogWalkerStatus> eventProcessor)`: Use this overload, which takes an `Action`, to process each `InsightEvent` synchronously, like when all state is stored only in memory.
+- `Task<IEventLogWalkerStatus> WalkAsync(WalkArgs args, Func<InsightEvent, IEventLogWalkerStatus, Task> eventProcessor)`: Use this overload, which takes a `Func`, to process each `InsightEvent` asynchronously, like when writing to disk or a database.
 
 ### `WalkArgs`
 Properties:
