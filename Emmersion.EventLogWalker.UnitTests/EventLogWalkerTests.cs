@@ -76,10 +76,10 @@ namespace Emmersion.EventLogWalker.UnitTests
             var status = await ClassUnderTest.WalkAsync(walkArgs, eventProcessorFunc);
             await capturedEventProcessor.ProcessEventAsync(null, null);
 
-            GetMock<IResourceThrottle>().Verify(x => x.WaitForNextAccess(), Times.Exactly(2));
+            GetMock<IResourceThrottle>().Verify(x => x.WaitForNextAccessAsync(), Times.Exactly(2));
             GetMock<IResourceThrottle>().VerifySet(x => x.LastAccess = IsAny<DateTimeOffset>(), Times.Exactly(2));
             GetMock<IResourceThrottle>().VerifySet(x => x.MinimumDurationBetweenAccess = IsAny<TimeSpan>(), Times.Once);
-            GetMock<IResourceThrottle>().Verify(x => x.WaitForNextAccess(), Times.Exactly(2));
+            GetMock<IResourceThrottle>().Verify(x => x.WaitForNextAccessAsync(), Times.Exactly(2));
 
             var statusStateFieldInfo =
                 status.GetType().GetField("state", BindingFlags.NonPublic | BindingFlags.Instance);
