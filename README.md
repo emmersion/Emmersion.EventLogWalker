@@ -2,7 +2,11 @@
 
 Event logs can contain millions of records making them unsuited for direct query access. This library aims to simplify reading event logs by providing a resumable event log walker which exposes a single item at a time.
 
-Today this library is tightly coupled to the Insights product context event log.
+This has been [open sourced](https://github.com/emmersion/engineering-at-emmersion#open-source)
+under the [MIT License](./LICENSE).
+Currently this library is tightly coupled to our internal Insights product context event log and isn't usable as-is outside of Emmersion.
+But the concepts in the code may be useful for others who are wanting to deal with large volumes of data while staying in the .NET / C# stack.
+
 
 ## Configuration
 
