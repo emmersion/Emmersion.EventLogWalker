@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Emmersion.EventLogWalker;
+using ExampleReports.Configuration;
 
 namespace ExampleReports
 {

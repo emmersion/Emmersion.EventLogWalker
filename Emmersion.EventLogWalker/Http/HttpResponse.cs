@@ -1,6 +1,6 @@
 ﻿namespace Emmersion.EventLogWalker.Http
 {
-    public class HttpResponse
+    internal class HttpResponse
     {
         public HttpResponse(int statusCode, HttpHeaders headers, string body)
         {

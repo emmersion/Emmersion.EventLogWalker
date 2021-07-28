@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Emmersion.EventLogWalker
 {
-    public class WalkState
+    internal class WalkState
     {
         public List<InsightEvent> Events { get; set; } = new List<InsightEvent>();
         public Cursor Cursor { get; set; }

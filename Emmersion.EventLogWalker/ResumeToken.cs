@@ -1,6 +1,6 @@
 ﻿namespace Emmersion.EventLogWalker
 {
-    public class ResumeToken
+    internal class ResumeToken
     {
         public Cursor Cursor { get; set; }
         public int PageEventIndex { get; set; }

@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace Emmersion.EventLogWalker.Http
 {
-    public class HttpHeaders
+    internal class HttpHeaders
     {
         private readonly IDictionary<string, IList<string>> headers = new Dictionary<string, IList<string>>();
 

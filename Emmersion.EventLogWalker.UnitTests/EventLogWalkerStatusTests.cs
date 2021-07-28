@@ -5,7 +5,7 @@ using NUnit.Framework;
 
 namespace Emmersion.EventLogWalker.UnitTests
 {
-    public class EventLogWalkerStatusTests : With_an_automocked<EventLogWalkerStatus>
+    internal class EventLogWalkerStatusTests : With_an_automocked<EventLogWalkerStatus>
     {
         [Test]
         public void When_getting_current_event_index()
@@ -18,7 +18,7 @@ namespace Emmersion.EventLogWalker.UnitTests
             var status = new EventLogWalkerStatus(walkState, null);
             Assert.That(status.PageEventIndex, Is.EqualTo(walkState.PageEventIndex));
         }
-        
+
         [Test]
         public void When_getting_count_of_events_in_page()
         {
@@ -63,7 +63,7 @@ namespace Emmersion.EventLogWalker.UnitTests
             var status = new EventLogWalkerStatus(walkState, null);
             Assert.That(status.PageStatus, Is.EqualTo(PageStatus.Start));
         }
-        
+
         [Test]
         public void When_the_last_event_of_the_page_is_being_processed()
         {
@@ -99,7 +99,7 @@ namespace Emmersion.EventLogWalker.UnitTests
             var status = new EventLogWalkerStatus(walkState, null);
             Assert.That(status.PageStatus, Is.EqualTo(PageStatus.Done));
         }
-        
+
         [Test]
         public void When_an_event_of_the_page_is_being_processed_which_is_not_the_first_or_last()
         {
@@ -117,7 +117,7 @@ namespace Emmersion.EventLogWalker.UnitTests
             var status = new EventLogWalkerStatus(walkState, null);
             Assert.That(status.PageStatus, Is.EqualTo(PageStatus.InProgress));
         }
-        
+
         [Test]
         public void When_the_page_is_empty()
         {
@@ -130,7 +130,7 @@ namespace Emmersion.EventLogWalker.UnitTests
             var status = new EventLogWalkerStatus(walkState, null);
             Assert.That(status.PageStatus, Is.EqualTo(PageStatus.Empty));
         }
-        
+
         [Test]
         public void When_getting_total_processed_events()
         {
@@ -142,7 +142,7 @@ namespace Emmersion.EventLogWalker.UnitTests
             var status = new EventLogWalkerStatus(walkState, null);
             Assert.That(status.TotalEventsProcessed, Is.EqualTo(walkState.TotalEventsProcessed));
         }
-        
+
         [Test]
         public void When_getting_the_resume_token()
         {

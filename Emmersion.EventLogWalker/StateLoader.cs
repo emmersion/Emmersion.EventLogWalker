@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace Emmersion.EventLogWalker
 {
-    public interface IStateLoader
+    internal interface IStateLoader
     {
         Task<WalkState> LoadInitialStateAsync(DateTimeOffset startInclusive, DateTimeOffset endExclusive,
             string resumeTokenJson);
@@ -12,7 +12,7 @@ namespace Emmersion.EventLogWalker
         Task<WalkState> LoadNextStateAsync(WalkState previousState);
     }
 
-    public class StateLoader : IStateLoader
+    internal class StateLoader : IStateLoader
     {
         private readonly IInsightsSystemApi insightsSystemApi;
         private readonly IJsonSerializer jsonSerializer;

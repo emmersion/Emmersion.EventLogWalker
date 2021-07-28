@@ -6,12 +6,12 @@ using Emmersion.EventLogWalker.Http;
 
 namespace Emmersion.EventLogWalker
 {
-    public interface IInsightsSystemApi
+    internal interface IInsightsSystemApi
     {
         Task<Page> GetPageAsync(Cursor cursor);
     }
 
-    public class InsightsSystemApi : IInsightsSystemApi
+    internal class InsightsSystemApi : IInsightsSystemApi
     {
         private readonly IHttpClient httpClient;
         private readonly IInsightsSystemApiSettings insightsSystemApiSettings;
@@ -49,13 +49,13 @@ namespace Emmersion.EventLogWalker
         }
     }
 
-    public class Page
+    internal class Page
     {
         public List<InsightEvent> Events { get; set; }
         public Cursor NextPage { get; set; }
     }
 
-    public class Cursor
+    internal class Cursor
     {
         public DateTimeOffset StartInclusive { get; set; }
         public DateTimeOffset EndExclusive { get; set; }

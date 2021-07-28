@@ -1,6 +1,10 @@
-﻿using Emmersion.EventLogWalker.Http;
+﻿using System.Runtime.CompilerServices;
+using Emmersion.EventLogWalker.Http;
 using Microsoft.Extensions.DependencyInjection;
 
+[assembly:InternalsVisibleTo("Emmersion.EventLogWalker.UnitTests")]
+[assembly:InternalsVisibleTo("Emmersion.EventLogWalker.IntegrationTests")]
+[assembly:InternalsVisibleTo("DynamicProxyGenAssembly2")]
 namespace Emmersion.EventLogWalker.Configuration
 {
     public static class DependencyInjectionConfig
@@ -10,7 +14,7 @@ namespace Emmersion.EventLogWalker.Configuration
             services.Scan(
                 scan =>
                 {
-                    scan.FromAssembliesOf(typeof(DependencyInjectionConfig)).AddClasses().AsMatchingInterface().WithTransientLifetime();
+                    scan.FromAssembliesOf(typeof(DependencyInjectionConfig)).AddClasses(publicOnly: false).AsMatchingInterface().WithTransientLifetime();
                 }
             );
 

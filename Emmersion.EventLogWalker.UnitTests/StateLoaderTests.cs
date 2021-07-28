@@ -7,7 +7,7 @@ using NUnit.Framework;
 
 namespace Emmersion.EventLogWalker.UnitTests
 {
-    public class StateLoaderTests: With_an_automocked<StateLoader>
+    internal class StateLoaderTests: With_an_automocked<StateLoader>
     {
         [Test]
         public async Task When_loading_initial_state_and_not_resuming()

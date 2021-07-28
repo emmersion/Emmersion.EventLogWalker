@@ -8,7 +8,7 @@ using NUnit.Framework;
 
 namespace Emmersion.EventLogWalker.UnitTests
 {
-    public class InsightsSystemApiTests : With_an_automocked<InsightsSystemApi>
+    internal class InsightsSystemApiTests : With_an_automocked<InsightsSystemApi>
     {
         [Test]
         public async Task When_getting_a_page()

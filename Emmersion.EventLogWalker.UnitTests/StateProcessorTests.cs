@@ -7,7 +7,7 @@ using NUnit.Framework;
 
 namespace Emmersion.EventLogWalker.UnitTests
 {
-    public class StateProcessorTests : With_an_automocked<StateProcessor>
+    internal class StateProcessorTests : With_an_automocked<StateProcessor>
     {
         [Test]
         public async Task When_processing_state()

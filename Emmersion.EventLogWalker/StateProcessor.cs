@@ -3,12 +3,12 @@ using System.Threading.Tasks;
 
 namespace Emmersion.EventLogWalker
 {
-    public interface IStateProcessor
+    internal interface IStateProcessor
     {
         Task<WalkState> ProcessStateAsync(IEventProcessor eventProcessor, WalkState state);
     }
 
-    public class StateProcessor : IStateProcessor
+    internal class StateProcessor : IStateProcessor
     {
         private readonly IJsonSerializer jsonSerializer;
 

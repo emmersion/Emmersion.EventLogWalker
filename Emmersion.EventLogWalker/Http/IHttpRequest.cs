@@ -2,7 +2,7 @@
 
 namespace Emmersion.EventLogWalker.Http
 {
-    public interface IHttpRequest
+    internal interface IHttpRequest
     {
         string Url { get; set; }
         HttpHeaders Headers { get; set; }

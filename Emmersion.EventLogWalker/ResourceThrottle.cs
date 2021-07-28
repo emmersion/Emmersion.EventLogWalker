@@ -3,14 +3,14 @@ using System.Threading.Tasks;
 
 namespace Emmersion.EventLogWalker
 {
-    public interface IResourceThrottle
+    internal interface IResourceThrottle
     {
         Task WaitForNextAccessAsync();
         TimeSpan MinimumDurationBetweenAccess { get; set; }
         DateTimeOffset LastAccess { get; set; }
     }
 
-    public class ResourceThrottle : IResourceThrottle
+    internal class ResourceThrottle : IResourceThrottle
     {
         private readonly ITaskDelayer taskDelayer;
 

@@ -1,15 +1,15 @@
 ﻿using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace Emmersion.EventLogWalker
+namespace ExampleReports.Configuration
 {
-    internal interface IJsonSerializer
+    public interface IJsonSerializer
     {
         T Deserialize<T>(string input);
         string Serialize<T>(T input);
     }
 
-    internal class JsonSerializer : IJsonSerializer
+    public class JsonSerializer : IJsonSerializer
     {
         private static readonly JsonSerializerOptions options = new JsonSerializerOptions
         {

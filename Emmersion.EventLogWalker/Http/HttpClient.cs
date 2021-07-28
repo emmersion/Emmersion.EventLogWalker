@@ -6,12 +6,12 @@ using System.Threading.Tasks;
 
 namespace Emmersion.EventLogWalker.Http
 {
-    public interface IHttpClient
+    internal interface IHttpClient
     {
         Task<HttpResponse> ExecutePostAsync(IHttpRequest request);
     }
 
-    public class HttpClient : IHttpClient, IDisposable
+    internal class HttpClient : IHttpClient, IDisposable
     {
         private readonly System.Net.Http.HttpClient client;
 

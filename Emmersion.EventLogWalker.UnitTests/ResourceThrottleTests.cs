@@ -5,7 +5,7 @@ using NUnit.Framework;
 
 namespace Emmersion.EventLogWalker.UnitTests
 {
-    public class ResourceThrottleTests : With_an_automocked<ResourceThrottle>
+    internal class ResourceThrottleTests : With_an_automocked<ResourceThrottle>
     {
         [Test]
         public async Task When_waiting_for_next_access_and_not_enough_time_has_elapsed()

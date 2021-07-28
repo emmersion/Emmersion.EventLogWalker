@@ -3,12 +3,12 @@ using System.Threading.Tasks;
 
 namespace Emmersion.EventLogWalker
 {
-    public interface ITaskDelayer
+    internal interface ITaskDelayer
     {
         Task DelayAsync(TimeSpan duration);
     }
 
-    public class TaskDelayer : ITaskDelayer
+    internal class TaskDelayer : ITaskDelayer
     {
         public async Task DelayAsync(TimeSpan duration)
         {

@@ -10,7 +10,7 @@ namespace Emmersion.EventLogWalker
         Task<IEventLogWalkerStatus> WalkAsync(WalkArgs args, Action<InsightEvent, IEventLogWalkerStatus> eventProcessor);
     }
 
-    public class EventLogWalker : IEventLogWalker
+    internal class EventLogWalker : IEventLogWalker
     {
         private readonly IStateLoader stateLoader;
         private readonly IStateProcessor stateProcessor;

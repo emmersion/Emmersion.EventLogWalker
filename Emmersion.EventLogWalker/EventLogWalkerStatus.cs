@@ -13,7 +13,7 @@ namespace Emmersion.EventLogWalker
         string GetResumeToken();
     }
 
-    public class EventLogWalkerStatus : IEventLogWalkerStatus
+    internal class EventLogWalkerStatus : IEventLogWalkerStatus
     {
         private readonly WalkState state;
         private readonly IJsonSerializer jsonSerializer;

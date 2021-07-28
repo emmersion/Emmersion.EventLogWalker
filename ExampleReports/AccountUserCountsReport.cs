@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Emmersion.EventLogWalker;
+using ExampleReports.Configuration;
 
 namespace ExampleReports
 {
@@ -75,6 +76,9 @@ args =>
             var headerRow =
                 $"{nameof(EventCounts.EventType)},{nameof(EventCounts.DistinctAccounts)},{nameof(EventCounts.DistinctUsers)}";
             csvWriter.WriteAll(fileName, headerRow, eventCounts);
+
+            Console.WriteLine($"Wrote to: {fileName}");
+
             fileSystem.DeleteFile(StateFilePath);
         }
 

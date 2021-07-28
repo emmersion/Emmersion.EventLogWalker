@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Emmersion.EventLogWalker;
 using Emmersion.Testing;
+using ExampleReports.Configuration;
 using Moq;
 using NUnit.Framework;
 

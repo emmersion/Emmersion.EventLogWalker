@@ -8,7 +8,7 @@ using NUnit.Framework;
 
 namespace Emmersion.EventLogWalker.UnitTests
 {
-    public class EventLogWalkerTests : With_an_automocked<EventLogWalker>
+    internal class EventLogWalkerTests : With_an_automocked<EventLogWalker>
     {
         [Test]
         public void When_constructing_default_args()

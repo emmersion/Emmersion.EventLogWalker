@@ -3,12 +3,12 @@ using System.Threading.Tasks;
 
 namespace Emmersion.EventLogWalker
 {
-    public interface IEventProcessor
+    internal interface IEventProcessor
     {
         Task ProcessEventAsync(InsightEvent insightEvent, IEventLogWalkerStatus status);
     }
 
-    public class EventProcessor : IEventProcessor
+    internal class EventProcessor : IEventProcessor
     {
         private readonly Func<InsightEvent, IEventLogWalkerStatus, Task> processorFunc;
 

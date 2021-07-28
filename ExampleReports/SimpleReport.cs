@@ -34,7 +34,7 @@ namespace ExampleReports
                     eventCounts[insightEvent.EventType] = 1;
                 }
             });
-
+            
             if (finalStatus.Exception != null)
             {
                 Console.WriteLine(finalStatus.Exception);

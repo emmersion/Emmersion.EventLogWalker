@@ -3,7 +3,7 @@ using System.Text;
 
 namespace Emmersion.EventLogWalker.Http
 {
-    public class HttpRequest : IHttpRequest
+    internal class HttpRequest : IHttpRequest
     {
         public HttpRequest()
         {
