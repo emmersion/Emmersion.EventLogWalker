@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Emmersion.EventLogWalker;
@@ -77,7 +78,7 @@ args =>
                 $"{nameof(EventCounts.EventType)},{nameof(EventCounts.DistinctAccounts)},{nameof(EventCounts.DistinctUsers)}";
             csvWriter.WriteAll(fileName, headerRow, eventCounts);
 
-            Console.WriteLine($"Wrote to: {fileName}");
+            Console.WriteLine($"Wrote to: {Directory.GetCurrentDirectory()}\\{fileName}");
 
             fileSystem.DeleteFile(StateFilePath);
         }
