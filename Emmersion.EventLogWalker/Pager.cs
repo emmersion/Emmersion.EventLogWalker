@@ -15,6 +15,11 @@ namespace Emmersion.EventLogWalker
         public Cursor NextPage { get; set; }
     }
 
+    public class WalkedEvent
+    {
+        public object Event { get; set; }
+    }
+
     public class Cursor
     {
         public DateTimeOffset StartInclusive { get; set; }

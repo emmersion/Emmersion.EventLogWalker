@@ -18,8 +18,8 @@ namespace Emmersion.EventLogWalker.UnitTests
                 PageNumber = pageNumber,
                 Events = new List<WalkedEvent>
                 {
-                    new WalkedEvent(),
-                    new WalkedEvent()
+                    new WalkedEvent{ Event = new InsightEvent() },
+                    new WalkedEvent{ Event = new InsightEvent() }
                 },
                 Cursor = new Cursor(),
                 PreviousCursor = new Cursor(),
@@ -29,12 +29,12 @@ namespace Emmersion.EventLogWalker.UnitTests
             IEventLogWalkerStatus capturedStatus1 = null;
             IEventLogWalkerStatus capturedStatus2 = null;
 
-            var mockEventProcessor = GetMock<IEventProcessor>();
+            var mockEventProcessor = GetMock<IEventProcessor<InsightEvent>>();
 
-            mockEventProcessor.Setup(x => x.ProcessEventAsync(initialState.Events[0], IsAny<IEventLogWalkerStatus>()))
-                .Callback<WalkedEvent, IEventLogWalkerStatus>((_, status) => capturedStatus1 = status);
-            mockEventProcessor.Setup(x => x.ProcessEventAsync(initialState.Events[1], IsAny<IEventLogWalkerStatus>()))
-                .Callback<WalkedEvent, IEventLogWalkerStatus>((_, status) => capturedStatus2 = status);
+            mockEventProcessor.Setup(x => x.ProcessEventAsync((InsightEvent)initialState.Events[0].Event, IsAny<IEventLogWalkerStatus>()))
+                .Callback<InsightEvent, IEventLogWalkerStatus>((_, status) => capturedStatus1 = status);
+            mockEventProcessor.Setup(x => x.ProcessEventAsync((InsightEvent)initialState.Events[1].Event, IsAny<IEventLogWalkerStatus>()))
+                .Callback<InsightEvent, IEventLogWalkerStatus>((_, status) => capturedStatus2 = status);
 
             var finalState =
                 await ClassUnderTest.ProcessStateAsync(mockEventProcessor.Object, initialState);
@@ -70,8 +70,8 @@ namespace Emmersion.EventLogWalker.UnitTests
             {
                 Events = new List<WalkedEvent>
                 {
-                    new WalkedEvent(),
-                    new WalkedEvent()
+                    new WalkedEvent{ Event = new InsightEvent() },
+                    new WalkedEvent{ Event = new InsightEvent() }
                 },
                 PageNumber = 2,
                 Cursor = new Cursor(),
@@ -81,10 +81,10 @@ namespace Emmersion.EventLogWalker.UnitTests
             };
             IEventLogWalkerStatus capturedStatus = null;
 
-            var mockEventProcessor = GetMock<IEventProcessor>();
+            var mockEventProcessor = GetMock<IEventProcessor<InsightEvent>>();
 
-            mockEventProcessor.Setup(x => x.ProcessEventAsync(initialState.Events[1], IsAny<IEventLogWalkerStatus>()))
-                .Callback<WalkedEvent, IEventLogWalkerStatus>((_, status) => capturedStatus = status);
+            mockEventProcessor.Setup(x => x.ProcessEventAsync((InsightEvent)initialState.Events[1].Event, IsAny<IEventLogWalkerStatus>()))
+                .Callback<InsightEvent, IEventLogWalkerStatus>((_, status) => capturedStatus = status);
 
             var finalState =
                 await ClassUnderTest.ProcessStateAsync(mockEventProcessor.Object, initialState);
@@ -116,9 +116,9 @@ namespace Emmersion.EventLogWalker.UnitTests
             };
 
             IEventLogWalkerStatus capturedStatus = null;
-            var mockEventProcessor = GetMock<IEventProcessor>();
-            mockEventProcessor.Setup(x => x.ProcessEventAsync(initialState.Events[0], IsAny<IEventLogWalkerStatus>()))
-                .Callback<WalkedEvent, IEventLogWalkerStatus>((_, status) => capturedStatus = status)
+            var mockEventProcessor = GetMock<IEventProcessor<InsightEvent>>();
+            mockEventProcessor.Setup(x => x.ProcessEventAsync((InsightEvent)initialState.Events[0].Event, IsAny<IEventLogWalkerStatus>()))
+                .Callback<InsightEvent, IEventLogWalkerStatus>((_, status) => capturedStatus = status)
                 .Throws(exception);
 
             var finalState = await ClassUnderTest.ProcessStateAsync(mockEventProcessor.Object, initialState);

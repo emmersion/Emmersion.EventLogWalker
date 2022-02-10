@@ -5,7 +5,8 @@ namespace Emmersion.EventLogWalker
 {
     internal interface IStateProcessor
     {
-        Task<WalkState> ProcessStateAsync(IEventProcessor eventProcessor, WalkState state);
+        Task<WalkState> ProcessStateAsync<TEvent>(IEventProcessor<TEvent> eventProcessor, WalkState state)
+            where TEvent : class;
     }
 
     internal class StateProcessor : IStateProcessor
@@ -17,7 +18,8 @@ namespace Emmersion.EventLogWalker
             this.jsonSerializer = jsonSerializer;
         }
 
-        public async Task<WalkState> ProcessStateAsync(IEventProcessor eventProcessor, WalkState state)
+        public async Task<WalkState> ProcessStateAsync<TEvent>(IEventProcessor<TEvent> eventProcessor, WalkState state)
+            where TEvent : class
         {
             var processedEvents = 0;
             var walkStateInProgress = state;
@@ -34,7 +36,8 @@ namespace Emmersion.EventLogWalker
                         PageEventIndex = i,
                         TotalEventsProcessed = state.TotalEventsProcessed + processedEvents
                     };
-                    await eventProcessor.ProcessEventAsync(state.Events[i],
+
+                    await eventProcessor.ProcessEventAsync(state.Events[i].Event as TEvent,
                         new EventLogWalkerStatus(walkStateInProgress, jsonSerializer));
                     processedEvents++;
                 }

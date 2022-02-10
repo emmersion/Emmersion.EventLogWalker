@@ -53,27 +53,27 @@ namespace Emmersion.EventLogWalker.UnitTests
                 Cursor = null
             };
             var eventProcessorFuncWasCalled = false;
-            Func<WalkedEvent, IEventLogWalkerStatus, Task> eventProcessorFunc = (xEvent, xStatus) =>
+            Func<InsightEvent, IEventLogWalkerStatus, Task> eventProcessorFunc = (xEvent, xStatus) =>
             {
                 eventProcessorFuncWasCalled = true;
                 return Task.CompletedTask;
             };
-            IEventProcessor capturedEventProcessor = null;
+            IEventProcessor<InsightEvent> capturedEventProcessor = null;
 
             GetMock<IStateLoader>()
                 .Setup(x => x.LoadInitialStateAsync(walkArgs.StartInclusive, walkArgs.EndExclusive, null))
                 .ReturnsAsync(initialState);
-            GetMock<IStateProcessor>().Setup(x => x.ProcessStateAsync(IsAny<IEventProcessor>(), initialState))
-                .Callback<IEventProcessor, WalkState>((eventProcessor, _) => capturedEventProcessor = eventProcessor)
+            GetMock<IStateProcessor>().Setup(x => x.ProcessStateAsync(IsAny<IEventProcessor<InsightEvent>>(), initialState))
+                .Callback<IEventProcessor<InsightEvent>, WalkState>((eventProcessor, _) => capturedEventProcessor = eventProcessor)
                 .ReturnsAsync(state2);
             GetMock<IStateLoader>().Setup(x => x.LoadNextStateAsync(state2))
                 .ReturnsAsync(state3);
-            GetMock<IStateProcessor>().Setup(x => x.ProcessStateAsync(IsAny<IEventProcessor>(), state3))
+            GetMock<IStateProcessor>().Setup(x => x.ProcessStateAsync(IsAny<IEventProcessor<InsightEvent>>(), state3))
                 .ReturnsAsync(state4);
             GetMock<IStateLoader>().Setup(x => x.LoadNextStateAsync(state4))
                 .ReturnsAsync(finalState);
 
-            var status = await ClassUnderTest.WalkAsync(walkArgs, eventProcessorFunc);
+            var status = await ClassUnderTest.WalkAsync<InsightEvent>(walkArgs, eventProcessorFunc);
             await capturedEventProcessor.ProcessEventAsync(null, null);
 
             GetMock<IResourceThrottle>().Verify(x => x.WaitForNextAccessAsync(), Times.Exactly(2));
@@ -111,20 +111,20 @@ namespace Emmersion.EventLogWalker.UnitTests
                 Exception = new Exception(RandomString())
             };
             var eventProcessorFuncWasCalled = false;
-            Action<WalkedEvent, IEventLogWalkerStatus> eventProcessorFunc = (xEvent, xStatus) =>
+            Action<InsightEvent, IEventLogWalkerStatus> eventProcessorFunc = (xEvent, xStatus) =>
             {
                 eventProcessorFuncWasCalled = true;
             };
-            IEventProcessor capturedEventProcessor = null;
+            IEventProcessor<InsightEvent> capturedEventProcessor = null;
 
             GetMock<IStateLoader>()
                 .Setup(x => x.LoadInitialStateAsync(walkArgs.StartInclusive, walkArgs.EndExclusive, null))
                 .ReturnsAsync(initialState);
-            GetMock<IStateProcessor>().Setup(x => x.ProcessStateAsync(IsAny<IEventProcessor>(), initialState))
-                .Callback<IEventProcessor, WalkState>((eventProcessor, _) => capturedEventProcessor = eventProcessor)
+            GetMock<IStateProcessor>().Setup(x => x.ProcessStateAsync(IsAny<IEventProcessor<InsightEvent>>(), initialState))
+                .Callback<IEventProcessor<InsightEvent>, WalkState>((eventProcessor, _) => capturedEventProcessor = eventProcessor)
                 .ReturnsAsync(state2);
 
-            await ClassUnderTest.WalkAsync(walkArgs, eventProcessorFunc);
+            await ClassUnderTest.WalkAsync<InsightEvent>(walkArgs, eventProcessorFunc);
             await capturedEventProcessor.ProcessEventAsync(null, null);
 
             Assert.That(eventProcessorFuncWasCalled, Is.True);
@@ -158,12 +158,12 @@ namespace Emmersion.EventLogWalker.UnitTests
             GetMock<IStateLoader>().Setup(x =>
                     x.LoadInitialStateAsync(walkArgs.StartInclusive, walkArgs.EndExclusive, walkArgs.ResumeToken))
                 .ReturnsAsync(resumingInitialState);
-            GetMock<IStateProcessor>().Setup(x => x.ProcessStateAsync(IsAny<IEventProcessor>(), resumingInitialState))
+            GetMock<IStateProcessor>().Setup(x => x.ProcessStateAsync(IsAny<IEventProcessor<InsightEvent>>(), resumingInitialState))
                 .ReturnsAsync(state1);
             GetMock<IStateLoader>().Setup(x => x.LoadNextStateAsync(state1))
                 .ReturnsAsync(finalState);
 
-            await ClassUnderTest.WalkAsync(walkArgs, (x, y) => { });
+            await ClassUnderTest.WalkAsync<InsightEvent>(walkArgs, (x, y) => { });
         }
 
         [Test]
@@ -186,7 +186,7 @@ namespace Emmersion.EventLogWalker.UnitTests
                 .Setup(x => x.LoadInitialStateAsync(walkArgs.StartInclusive, walkArgs.EndExclusive, null))
                 .ReturnsAsync(initialStateWithError);
 
-            var status = await ClassUnderTest.WalkAsync(walkArgs, (x, y) => { });
+            var status = await ClassUnderTest.WalkAsync<InsightEvent>(walkArgs, (x, y) => { });
 
             var statusStateFieldInfo =
                 status.GetType().GetField("state", BindingFlags.NonPublic | BindingFlags.Instance);
@@ -221,10 +221,10 @@ namespace Emmersion.EventLogWalker.UnitTests
             GetMock<IStateLoader>()
                 .Setup(x => x.LoadInitialStateAsync(walkArgs.StartInclusive, walkArgs.EndExclusive, null))
                 .ReturnsAsync(initialState);
-            GetMock<IStateProcessor>().Setup(x => x.ProcessStateAsync(IsAny<IEventProcessor>(), initialState))
+            GetMock<IStateProcessor>().Setup(x => x.ProcessStateAsync(IsAny<IEventProcessor<InsightEvent>>(), initialState))
                 .ReturnsAsync(stateWithError);
 
-            var status = await ClassUnderTest.WalkAsync(walkArgs, (x, y) => { });
+            var status = await ClassUnderTest.WalkAsync<InsightEvent>(walkArgs, (x, y) => { });
 
             var statusStateFieldInfo =
                 status.GetType().GetField("state", BindingFlags.NonPublic | BindingFlags.Instance);
@@ -271,14 +271,14 @@ namespace Emmersion.EventLogWalker.UnitTests
             GetMock<IStateLoader>()
                 .Setup(x => x.LoadInitialStateAsync(walkArgs.StartInclusive, walkArgs.EndExclusive, null))
                 .ReturnsAsync(initialState);
-            GetMock<IStateProcessor>().Setup(x => x.ProcessStateAsync(IsAny<IEventProcessor>(), initialState))
+            GetMock<IStateProcessor>().Setup(x => x.ProcessStateAsync(IsAny<IEventProcessor<InsightEvent>>(), initialState))
                 .ReturnsAsync(state2);
             GetMock<IStateLoader>().Setup(x => x.LoadNextStateAsync(state2))
                 .ReturnsAsync(stateWithError);
 
-            var status = await ClassUnderTest.WalkAsync(walkArgs, (x, y) => { });
+            var status = await ClassUnderTest.WalkAsync<InsightEvent>(walkArgs, (x, y) => { });
 
-            GetMock<IStateProcessor>().Verify(x => x.ProcessStateAsync(IsAny<IEventProcessor>(), IsAny<WalkState>()),
+            GetMock<IStateProcessor>().Verify(x => x.ProcessStateAsync(IsAny<IEventProcessor<InsightEvent>>(), IsAny<WalkState>()),
                 Times.Once);
 
             var statusStateFieldInfo =

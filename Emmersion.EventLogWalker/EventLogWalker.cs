@@ -6,8 +6,10 @@ namespace Emmersion.EventLogWalker
 {
     public interface IEventLogWalker
     {
-        Task<IEventLogWalkerStatus> WalkAsync(WalkArgs args, Func<WalkedEvent, IEventLogWalkerStatus, Task> eventProcessor);
-        Task<IEventLogWalkerStatus> WalkAsync(WalkArgs args, Action<WalkedEvent, IEventLogWalkerStatus> eventProcessor);
+        Task<IEventLogWalkerStatus> WalkAsync<TEvent>(WalkArgs args, Func<TEvent, IEventLogWalkerStatus, Task> eventProcessor)
+            where TEvent : class;
+        Task<IEventLogWalkerStatus> WalkAsync<TEvent>(WalkArgs args, Action<TEvent, IEventLogWalkerStatus> eventProcessor)
+            where TEvent : class;
     }
 
     internal class EventLogWalker : IEventLogWalker
@@ -26,17 +28,20 @@ namespace Emmersion.EventLogWalker
             resourceThrottle.MinimumDurationBetweenAccess = TimeSpan.FromSeconds(1);
         }
 
-        public Task<IEventLogWalkerStatus> WalkAsync(WalkArgs args, Func<WalkedEvent, IEventLogWalkerStatus, Task> eventProcessor)
+        public Task<IEventLogWalkerStatus> WalkAsync<TEvent>(WalkArgs args, Func<TEvent, IEventLogWalkerStatus, Task> eventProcessor)
+            where TEvent : class
         {
-            return WalkAsync(args, new EventProcessor(eventProcessor));
+            return WalkAsync(args, new EventProcessor<TEvent>(eventProcessor));
         }
 
-        public Task<IEventLogWalkerStatus> WalkAsync(WalkArgs args, Action<WalkedEvent, IEventLogWalkerStatus> eventProcessor)
+        public Task<IEventLogWalkerStatus> WalkAsync<TEvent>(WalkArgs args, Action<TEvent, IEventLogWalkerStatus> eventProcessor)
+            where TEvent : class
         {
-            return WalkAsync(args, new EventProcessor(eventProcessor));
+            return WalkAsync(args, new EventProcessor<TEvent>(eventProcessor));
         }
 
-        private async Task<IEventLogWalkerStatus> WalkAsync(WalkArgs args, IEventProcessor eventProcessor)
+        private async Task<IEventLogWalkerStatus> WalkAsync<TEvent>(WalkArgs args, IEventProcessor<TEvent> eventProcessor)
+            where TEvent : class
         {
             var state = await stateLoader.LoadInitialStateAsync(args.StartInclusive, args.EndExclusive, args.ResumeToken);
 

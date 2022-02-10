@@ -23,15 +23,15 @@ namespace ExampleReports
         {
             var eventCounts = new Dictionary<string, int>();
             
-            var finalStatus = await walker.WalkAsync(new WalkArgs(), (insightEvent, status) =>
+            var finalStatus = await walker.WalkAsync<InsightEvent>(new WalkArgs(), (insightEvent, status) =>
             {
-                if (eventCounts.ContainsKey(insightEvent.Event.EventType))
+                if (eventCounts.ContainsKey(insightEvent.EventType))
                 {
-                    eventCounts[insightEvent.Event.EventType] += 1;
+                    eventCounts[insightEvent.EventType] += 1;
                 }
                 else
                 {
-                    eventCounts[insightEvent.Event.EventType] = 1;
+                    eventCounts[insightEvent.EventType] = 1;
                 }
             });
             

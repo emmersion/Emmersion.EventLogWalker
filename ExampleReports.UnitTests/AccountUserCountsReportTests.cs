@@ -56,9 +56,9 @@ namespace ExampleReports.UnitTests
                 });
 
             WalkArgs capturedWalkArgs = null;
-            Action<WalkedEvent, IEventLogWalkerStatus> capturedFunc = null;
-            GetMock<IEventLogWalker>().Setup(x => x.WalkAsync(IsAny<WalkArgs>(), IsAny<Action<WalkedEvent, IEventLogWalkerStatus>>()))
-                .Callback<WalkArgs, Action<WalkedEvent, IEventLogWalkerStatus>>((args, func) =>
+            Action<InsightEvent, IEventLogWalkerStatus> capturedFunc = null;
+            GetMock<IEventLogWalker>().Setup(x => x.WalkAsync(IsAny<WalkArgs>(), IsAny<Action<InsightEvent, IEventLogWalkerStatus>>()))
+                .Callback<WalkArgs, Action<InsightEvent, IEventLogWalkerStatus>>((args, func) =>
                 {
                     capturedWalkArgs = args;
                     capturedFunc = func;
@@ -72,7 +72,7 @@ namespace ExampleReports.UnitTests
             Assert.That(capturedWalkArgs.StartInclusive, Is.EqualTo(reportPeriodStartInclusive));
             Assert.That(capturedWalkArgs.EndExclusive, Is.EqualTo(reportPeriodEndExclusive));
             Assert.That(capturedWalkArgs.ResumeToken, Is.Null);
-            Assert.That(capturedFunc, Is.EqualTo((Action<WalkedEvent, IEventLogWalkerStatus>)ClassUnderTest.ProcessEvent));
+            Assert.That(capturedFunc, Is.EqualTo((Action<InsightEvent, IEventLogWalkerStatus>)ClassUnderTest.ProcessEvent));
 
             Assert.That(capturedFileName, Is.EqualTo($"{nameof(AccountUserCountsReport)}_(from {reportPeriodStartInclusive:yyyy-MM-dd} to {reportPeriodEndExclusive:yyyy-MM-dd})_{DateTimeOffset.UtcNow:yyyy-MM-dd HH_mm_ss}.csv"));
             Assert.That(capturedHeaderRow, Is.EqualTo($"{nameof(EventCounts.EventType)},{nameof(EventCounts.DistinctAccounts)},{nameof(EventCounts.DistinctUsers)}"));
@@ -103,8 +103,8 @@ namespace ExampleReports.UnitTests
             GetMock<IJsonSerializer>().Setup(x => x.Deserialize<AccountUserCountsReportState>(stateJson)).Returns(reportState);
 
             WalkArgs capturedWalkArgs = null;
-            GetMock<IEventLogWalker>().Setup(x => x.WalkAsync(IsAny<WalkArgs>(), IsAny<Action<WalkedEvent, IEventLogWalkerStatus>>()))
-                .Callback<WalkArgs, Action<WalkedEvent, IEventLogWalkerStatus>>((args, _) => capturedWalkArgs = args)
+            GetMock<IEventLogWalker>().Setup(x => x.WalkAsync(IsAny<WalkArgs>(), IsAny<Action<InsightEvent, IEventLogWalkerStatus>>()))
+                .Callback<WalkArgs, Action<InsightEvent, IEventLogWalkerStatus>>((args, _) => capturedWalkArgs = args)
                 .ReturnsAsync(new TestEventLogWalkerStatus());
 
             await ClassUnderTest.GenerateAsync(reportPeriodStartInclusive, reportPeriodEndExclusive);
@@ -135,7 +135,7 @@ namespace ExampleReports.UnitTests
                 .Callback<AccountUserCountsReportState>(reportState => capturedAccountUserCountsReportState = reportState)
                 .Returns(stateJson);
 
-            GetMock<IEventLogWalker>().Setup(x => x.WalkAsync(IsAny<WalkArgs>(), IsAny<Action<WalkedEvent, IEventLogWalkerStatus>>()))
+            GetMock<IEventLogWalker>().Setup(x => x.WalkAsync(IsAny<WalkArgs>(), IsAny<Action<InsightEvent, IEventLogWalkerStatus>>()))
                 .ReturnsAsync(statusMock.Object);
 
             await ClassUnderTest.GenerateAsync(reportPeriodStartInclusive, reportPeriodEndExclusive);
@@ -151,186 +151,186 @@ namespace ExampleReports.UnitTests
         [Test]
         public void When_processing_multiple_events_of_the_same_type_for_distinct_accounts()
         {
-            var insightEvent1 = new WalkedEvent{ Event = new InsightEvent
+            var insightEvent1 = new InsightEvent
             {
                 EventType = RandomString(),
                 AccountId = NewGuid()
-            }};
+            };
             var status1 = new TestEventLogWalkerStatus();
 
             ClassUnderTest.ProcessEvent(insightEvent1,status1);
 
-            var insightEvent2 = new WalkedEvent{ Event = new InsightEvent
+            var insightEvent2 = new InsightEvent
             {
-                EventType = insightEvent1.Event.EventType,
+                EventType = insightEvent1.EventType,
                 AccountId = NewGuid()
-            }};
+            };
             var status2 = new TestEventLogWalkerStatus();
 
             ClassUnderTest.ProcessEvent(insightEvent2,status2);
 
             Assert.That(ClassUnderTest.EventAccountCounts, Has.Count.EqualTo(1));
-            Assert.That(ClassUnderTest.EventAccountCounts, Contains.Key(insightEvent1.Event.EventType));
-            Assert.That(ClassUnderTest.EventAccountCounts[insightEvent1.Event.EventType], Has.Count.EqualTo(2));
-            Assert.That(ClassUnderTest.EventAccountCounts[insightEvent1.Event.EventType],
-                Contains.Item(insightEvent1.Event.AccountId));
-            Assert.That(ClassUnderTest.EventAccountCounts[insightEvent1.Event.EventType],
-                Contains.Item(insightEvent2.Event.AccountId));
+            Assert.That(ClassUnderTest.EventAccountCounts, Contains.Key(insightEvent1.EventType));
+            Assert.That(ClassUnderTest.EventAccountCounts[insightEvent1.EventType], Has.Count.EqualTo(2));
+            Assert.That(ClassUnderTest.EventAccountCounts[insightEvent1.EventType],
+                Contains.Item(insightEvent1.AccountId));
+            Assert.That(ClassUnderTest.EventAccountCounts[insightEvent1.EventType],
+                Contains.Item(insightEvent2.AccountId));
         }
 
         [Test]
         public void When_processing_multiple_events_of_the_same_type_for_the_same_account()
         {
-            var insightEvent1 = new WalkedEvent{ Event = new InsightEvent
+            var insightEvent1 = new InsightEvent
             {
                 EventType = RandomString(),
                 AccountId = NewGuid()
-            }};
+            };
             var status1 = new TestEventLogWalkerStatus();
 
             ClassUnderTest.ProcessEvent(insightEvent1,status1);
 
-            var insightEvent2 = new WalkedEvent{ Event = new InsightEvent
+            var insightEvent2 = new InsightEvent
             {
-                EventType = insightEvent1.Event.EventType,
-                AccountId = insightEvent1.Event.AccountId
-            }};
+                EventType = insightEvent1.EventType,
+                AccountId = insightEvent1.AccountId
+            };
             var status2 = new TestEventLogWalkerStatus();
 
             ClassUnderTest.ProcessEvent(insightEvent2,status2);
 
             Assert.That(ClassUnderTest.EventAccountCounts, Has.Count.EqualTo(1));
-            Assert.That(ClassUnderTest.EventAccountCounts, Contains.Key(insightEvent1.Event.EventType));
-            Assert.That(ClassUnderTest.EventAccountCounts[insightEvent1.Event.EventType], Has.Count.EqualTo(1));
-            Assert.That(ClassUnderTest.EventAccountCounts[insightEvent1.Event.EventType],
-                Contains.Item(insightEvent1.Event.AccountId));
+            Assert.That(ClassUnderTest.EventAccountCounts, Contains.Key(insightEvent1.EventType));
+            Assert.That(ClassUnderTest.EventAccountCounts[insightEvent1.EventType], Has.Count.EqualTo(1));
+            Assert.That(ClassUnderTest.EventAccountCounts[insightEvent1.EventType],
+                Contains.Item(insightEvent1.AccountId));
         }
 
         [Test]
         public void When_processing_multiple_events_of_distinct_types_for_distinct_accounts()
         {
-            var insightEvent1 = new WalkedEvent{ Event = new InsightEvent
+            var insightEvent1 = new InsightEvent
             {
                 EventType = RandomString(),
                 AccountId = NewGuid()
-            }};
+            };
             var status1 = new TestEventLogWalkerStatus();
 
             ClassUnderTest.ProcessEvent(insightEvent1,status1);
 
-            var insightEvent2 = new WalkedEvent{ Event = new InsightEvent
+            var insightEvent2 = new InsightEvent
             {
                 EventType = RandomString(),
                 AccountId = NewGuid()
-            }};
+            };
             var status2 = new TestEventLogWalkerStatus();
 
             ClassUnderTest.ProcessEvent(insightEvent2,status2);
 
             Assert.That(ClassUnderTest.EventAccountCounts, Has.Count.EqualTo(2));
-            Assert.That(ClassUnderTest.EventAccountCounts, Contains.Key(insightEvent1.Event.EventType));
-            Assert.That(ClassUnderTest.EventAccountCounts[insightEvent1.Event.EventType], Has.Count.EqualTo(1));
-            Assert.That(ClassUnderTest.EventAccountCounts[insightEvent1.Event.EventType],
-                Contains.Item(insightEvent1.Event.AccountId));
-            Assert.That(ClassUnderTest.EventAccountCounts, Contains.Key(insightEvent2.Event.EventType));
-            Assert.That(ClassUnderTest.EventAccountCounts[insightEvent2.Event.EventType], Has.Count.EqualTo(1));
-            Assert.That(ClassUnderTest.EventAccountCounts[insightEvent2.Event.EventType],
-                Contains.Item(insightEvent2.Event.AccountId));
+            Assert.That(ClassUnderTest.EventAccountCounts, Contains.Key(insightEvent1.EventType));
+            Assert.That(ClassUnderTest.EventAccountCounts[insightEvent1.EventType], Has.Count.EqualTo(1));
+            Assert.That(ClassUnderTest.EventAccountCounts[insightEvent1.EventType],
+                Contains.Item(insightEvent1.AccountId));
+            Assert.That(ClassUnderTest.EventAccountCounts, Contains.Key(insightEvent2.EventType));
+            Assert.That(ClassUnderTest.EventAccountCounts[insightEvent2.EventType], Has.Count.EqualTo(1));
+            Assert.That(ClassUnderTest.EventAccountCounts[insightEvent2.EventType],
+                Contains.Item(insightEvent2.AccountId));
         }
 
         [Test]
         public void When_processing_multiple_events_of_the_same_type_for_distinct_user()
         {
-            var insightEvent1 = new WalkedEvent{ Event = new InsightEvent
+            var insightEvent1 = new InsightEvent
             {
                 EventType = RandomString(),
                 UserId = NewGuid()
-            }};
+            };
             var status1 = new TestEventLogWalkerStatus();
 
             ClassUnderTest.ProcessEvent(insightEvent1,status1);
 
-            var insightEvent2 = new WalkedEvent{ Event = new InsightEvent
+            var insightEvent2 = new InsightEvent
             {
-                EventType = insightEvent1.Event.EventType,
+                EventType = insightEvent1.EventType,
                 UserId = NewGuid()
-            }};
+            };
             var status2 = new TestEventLogWalkerStatus();
 
             ClassUnderTest.ProcessEvent(insightEvent2,status2);
 
             Assert.That(ClassUnderTest.EventUserCounts, Has.Count.EqualTo(1));
-            Assert.That(ClassUnderTest.EventUserCounts, Contains.Key(insightEvent1.Event.EventType));
-            Assert.That(ClassUnderTest.EventUserCounts[insightEvent1.Event.EventType], Has.Count.EqualTo(2));
-            Assert.That(ClassUnderTest.EventUserCounts[insightEvent1.Event.EventType], Contains.Item(insightEvent1.Event.UserId));
-            Assert.That(ClassUnderTest.EventUserCounts[insightEvent1.Event.EventType], Contains.Item(insightEvent2.Event.UserId));
+            Assert.That(ClassUnderTest.EventUserCounts, Contains.Key(insightEvent1.EventType));
+            Assert.That(ClassUnderTest.EventUserCounts[insightEvent1.EventType], Has.Count.EqualTo(2));
+            Assert.That(ClassUnderTest.EventUserCounts[insightEvent1.EventType], Contains.Item(insightEvent1.UserId));
+            Assert.That(ClassUnderTest.EventUserCounts[insightEvent1.EventType], Contains.Item(insightEvent2.UserId));
         }
 
         [Test]
         public void When_processing_multiple_events_of_the_same_type_for_the_same_user()
         {
-            var insightEvent1 = new WalkedEvent{ Event = new InsightEvent
+            var insightEvent1 = new InsightEvent
             {
                 EventType = RandomString(),
                 UserId = NewGuid()
-            }};
+            };
             var status1 = new TestEventLogWalkerStatus();
 
             ClassUnderTest.ProcessEvent(insightEvent1,status1);
 
-            var insightEvent2 = new WalkedEvent{ Event = new InsightEvent
+            var insightEvent2 = new InsightEvent
             {
-                EventType = insightEvent1.Event.EventType,
-                UserId = insightEvent1.Event.UserId
-            }};
+                EventType = insightEvent1.EventType,
+                UserId = insightEvent1.UserId
+            };
             var status2 = new TestEventLogWalkerStatus();
 
             ClassUnderTest.ProcessEvent(insightEvent2,status2);
 
             Assert.That(ClassUnderTest.EventUserCounts, Has.Count.EqualTo(1));
-            Assert.That(ClassUnderTest.EventUserCounts, Contains.Key(insightEvent1.Event.EventType));
-            Assert.That(ClassUnderTest.EventUserCounts[insightEvent1.Event.EventType], Has.Count.EqualTo(1));
-            Assert.That(ClassUnderTest.EventUserCounts[insightEvent1.Event.EventType], Contains.Item(insightEvent1.Event.UserId));
+            Assert.That(ClassUnderTest.EventUserCounts, Contains.Key(insightEvent1.EventType));
+            Assert.That(ClassUnderTest.EventUserCounts[insightEvent1.EventType], Has.Count.EqualTo(1));
+            Assert.That(ClassUnderTest.EventUserCounts[insightEvent1.EventType], Contains.Item(insightEvent1.UserId));
         }
 
         [Test]
         public void When_processing_multiple_events_of_distinct_types_for_distinct_users()
         {
-            var insightEvent1 = new WalkedEvent{ Event = new InsightEvent
+            var insightEvent1 = new InsightEvent
             {
                 EventType = RandomString(),
                 UserId = NewGuid()
-            }};
+            };
             var status1 = new TestEventLogWalkerStatus();
 
             ClassUnderTest.ProcessEvent(insightEvent1,status1);
 
-            var insightEvent2 = new WalkedEvent{ Event = new InsightEvent
+            var insightEvent2 = new InsightEvent
             {
                 EventType = RandomString(),
                 UserId = NewGuid()
-            }};
+            };
             var status2 = new TestEventLogWalkerStatus();
 
             ClassUnderTest.ProcessEvent(insightEvent2,status2);
 
             Assert.That(ClassUnderTest.EventUserCounts, Has.Count.EqualTo(2));
-            Assert.That(ClassUnderTest.EventUserCounts, Contains.Key(insightEvent1.Event.EventType));
-            Assert.That(ClassUnderTest.EventUserCounts[insightEvent1.Event.EventType], Has.Count.EqualTo(1));
-            Assert.That(ClassUnderTest.EventUserCounts[insightEvent1.Event.EventType], Contains.Item(insightEvent1.Event.UserId));
-            Assert.That(ClassUnderTest.EventUserCounts, Contains.Key(insightEvent2.Event.EventType));
-            Assert.That(ClassUnderTest.EventUserCounts[insightEvent2.Event.EventType], Has.Count.EqualTo(1));
-            Assert.That(ClassUnderTest.EventUserCounts[insightEvent2.Event.EventType], Contains.Item(insightEvent2.Event.UserId));
+            Assert.That(ClassUnderTest.EventUserCounts, Contains.Key(insightEvent1.EventType));
+            Assert.That(ClassUnderTest.EventUserCounts[insightEvent1.EventType], Has.Count.EqualTo(1));
+            Assert.That(ClassUnderTest.EventUserCounts[insightEvent1.EventType], Contains.Item(insightEvent1.UserId));
+            Assert.That(ClassUnderTest.EventUserCounts, Contains.Key(insightEvent2.EventType));
+            Assert.That(ClassUnderTest.EventUserCounts[insightEvent2.EventType], Has.Count.EqualTo(1));
+            Assert.That(ClassUnderTest.EventUserCounts[insightEvent2.EventType], Contains.Item(insightEvent2.UserId));
         }
 
         [Test]
         public void When_processing_and_persist_state_should_occur()
         {
-            var insightEvent1 = new WalkedEvent{ Event = new InsightEvent
+            var insightEvent1 = new InsightEvent
             {
                 EventType = RandomString(),
                 UserId = NewGuid()
-            }};
+            };
             var resumeToken = RandomString();
             var stateJson = RandomString();
 
@@ -355,11 +355,11 @@ namespace ExampleReports.UnitTests
         [Test]
         public void When_processing_state_should_not_be_persisted_for_each_event()
         {
-            var insightEvent1 = new WalkedEvent{ Event = new InsightEvent
+            var insightEvent1 = new InsightEvent
             {
                 EventType = RandomString(),
                 UserId = NewGuid()
-            }};
+            };
 
             var statusMock = GetMock<IEventLogWalkerStatus>();
             statusMock.SetupGet(x => x.TotalEventsProcessed).Returns(499);

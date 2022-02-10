@@ -8,14 +8,14 @@ namespace Emmersion.EventLogWalker.UnitTests
         [Test]
         public async Task When_processing_an_event_async()
         {
-            var insightEvent = new WalkedEvent();
+            var insightEvent = new InsightEvent();
             var status = new EventLogWalkerStatus(null, null);
 
-            WalkedEvent capturedWalkedEvent = null;
+            InsightEvent capturedInsightEvent = null;
             IEventLogWalkerStatus capturedStatus = null;
-            var eventProcessor = new EventProcessor((xEvent, xStatus) =>
+            var eventProcessor = new EventProcessor<InsightEvent>((xEvent, xStatus) =>
             {
-                capturedWalkedEvent = xEvent;
+                capturedInsightEvent = xEvent;
                 capturedStatus = xStatus;
 
                 return Task.CompletedTask;
@@ -23,27 +23,27 @@ namespace Emmersion.EventLogWalker.UnitTests
 
             await eventProcessor.ProcessEventAsync(insightEvent, status);
 
-            Assert.That(capturedWalkedEvent, Is.SameAs(insightEvent));
+            Assert.That(capturedInsightEvent, Is.SameAs(insightEvent));
             Assert.That(capturedStatus, Is.SameAs(status));
         }
 
         [Test]
         public async Task When_processing_an_event_synchronous()
         {
-            var insightEvent = new WalkedEvent();
+            var insightEvent = new InsightEvent();
             var status = new EventLogWalkerStatus(null, null);
 
-            WalkedEvent capturedWalkedEvent = null;
+            InsightEvent capturedInsightEvent = null;
             IEventLogWalkerStatus capturedStatus = null;
-            var eventProcessor = new EventProcessor((xEvent, xStatus) =>
+            var eventProcessor = new EventProcessor<InsightEvent>((xEvent, xStatus) =>
             {
-                capturedWalkedEvent = xEvent;
+                capturedInsightEvent = xEvent;
                 capturedStatus = xStatus;
             });
 
             await eventProcessor.ProcessEventAsync(insightEvent, status);
 
-            Assert.That(capturedWalkedEvent, Is.SameAs(insightEvent));
+            Assert.That(capturedInsightEvent, Is.SameAs(insightEvent));
             Assert.That(capturedStatus, Is.SameAs(status));
         }
     }

@@ -53,7 +53,7 @@ args =>
             var resumeToken = LoadState();
 
             //  NOTE: See ExampleReports.Configuration.DependencyInjectionConfig to understand the package dependency needs
-            var status = await eventLogWalker.WalkAsync(
+            var status = await eventLogWalker.WalkAsync<InsightEvent>(
                 new WalkArgs
                 {
                     StartInclusive = reportPeriodStartInclusive,
@@ -95,7 +95,7 @@ args =>
             }).ToList();
         }
 
-        public void ProcessEvent(WalkedEvent walkedEvent, IEventLogWalkerStatus status)
+        public void ProcessEvent(InsightEvent insightEvent, IEventLogWalkerStatus status)
         {
             if (status.PageStatus == PageStatus.Start)
             {
@@ -103,31 +103,31 @@ args =>
                 eventTimeTracker.ItemCompleted($"Page number: {status.PageNumber}. TotalProcessedEvents: {status.TotalEventsProcessed}. ");
             }
 
-            StoreDistinctAccounts(walkedEvent);
-            StoreDistinctUsers(walkedEvent);
+            StoreDistinctAccounts(insightEvent);
+            StoreDistinctUsers(insightEvent);
         }
 
-        private void StoreDistinctAccounts(WalkedEvent walkedEvent)
+        private void StoreDistinctAccounts(InsightEvent insightEvent)
         {
-            if (EventAccountCounts.ContainsKey(walkedEvent.Event.EventType))
+            if (EventAccountCounts.ContainsKey(insightEvent.EventType))
             {
-                EventAccountCounts[walkedEvent.Event.EventType].Add(walkedEvent.Event.AccountId);
+                EventAccountCounts[insightEvent.EventType].Add(insightEvent.AccountId);
             }
             else
             {
-                EventAccountCounts[walkedEvent.Event.EventType] = new HashSet<Guid> {walkedEvent.Event.AccountId};
+                EventAccountCounts[insightEvent.EventType] = new HashSet<Guid> {insightEvent.AccountId};
             }
         }
 
-        private void StoreDistinctUsers(WalkedEvent walkedEvent)
+        private void StoreDistinctUsers(InsightEvent insightEvent)
         {
-            if (EventUserCounts.ContainsKey(walkedEvent.Event.EventType))
+            if (EventUserCounts.ContainsKey(insightEvent.EventType))
             {
-                EventUserCounts[walkedEvent.Event.EventType].Add(walkedEvent.Event.UserId);
+                EventUserCounts[insightEvent.EventType].Add(insightEvent.UserId);
             }
             else
             {
-                EventUserCounts[walkedEvent.Event.EventType] = new HashSet<Guid> {walkedEvent.Event.UserId};
+                EventUserCounts[insightEvent.EventType] = new HashSet<Guid> {insightEvent.UserId};
             }
         }
 

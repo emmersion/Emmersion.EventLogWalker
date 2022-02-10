@@ -35,7 +35,7 @@ namespace ExampleReports
             var state = LoadState();
             var eventIds = state.EventIds;
 
-            var finalStatus = await walker.WalkAsync(new WalkArgs {ResumeToken = state.WalkerResumeToken},
+            var finalStatus = await walker.WalkAsync<InsightEvent>(new WalkArgs {ResumeToken = state.WalkerResumeToken},
                 (insightEvent, status) =>
                 {
                     if (status.PageStatus == PageStatus.Start)
@@ -48,12 +48,12 @@ namespace ExampleReports
                     }
 
 
-                    if (eventIds.Contains(insightEvent.Event.Id))
+                    if (eventIds.Contains(insightEvent.Id))
                     {
-                        throw new Exception($"The id {insightEvent.Event.Id} was processed twice.");
+                        throw new Exception($"The id {insightEvent.Id} was processed twice.");
                     }
 
-                    eventIds.Add(insightEvent.Event.Id);
+                    eventIds.Add(insightEvent.Id);
                 });
 
             if (finalStatus.Exception != null)
