@@ -95,7 +95,7 @@ args =>
             }).ToList();
         }
 
-        public void ProcessEvent(InsightEvent insightEvent, IEventLogWalkerStatus status)
+        public void ProcessEvent(WalkedEvent walkedEvent, IEventLogWalkerStatus status)
         {
             if (status.PageStatus == PageStatus.Start)
             {
@@ -103,31 +103,31 @@ args =>
                 eventTimeTracker.ItemCompleted($"Page number: {status.PageNumber}. TotalProcessedEvents: {status.TotalEventsProcessed}. ");
             }
 
-            StoreDistinctAccounts(insightEvent);
-            StoreDistinctUsers(insightEvent);
+            StoreDistinctAccounts(walkedEvent);
+            StoreDistinctUsers(walkedEvent);
         }
 
-        private void StoreDistinctAccounts(InsightEvent insightEvent)
+        private void StoreDistinctAccounts(WalkedEvent walkedEvent)
         {
-            if (EventAccountCounts.ContainsKey(insightEvent.EventType))
+            if (EventAccountCounts.ContainsKey(walkedEvent.Event.EventType))
             {
-                EventAccountCounts[insightEvent.EventType].Add(insightEvent.AccountId);
+                EventAccountCounts[walkedEvent.Event.EventType].Add(walkedEvent.Event.AccountId);
             }
             else
             {
-                EventAccountCounts[insightEvent.EventType] = new HashSet<Guid> {insightEvent.AccountId};
+                EventAccountCounts[walkedEvent.Event.EventType] = new HashSet<Guid> {walkedEvent.Event.AccountId};
             }
         }
 
-        private void StoreDistinctUsers(InsightEvent insightEvent)
+        private void StoreDistinctUsers(WalkedEvent walkedEvent)
         {
-            if (EventUserCounts.ContainsKey(insightEvent.EventType))
+            if (EventUserCounts.ContainsKey(walkedEvent.Event.EventType))
             {
-                EventUserCounts[insightEvent.EventType].Add(insightEvent.UserId);
+                EventUserCounts[walkedEvent.Event.EventType].Add(walkedEvent.Event.UserId);
             }
             else
             {
-                EventUserCounts[insightEvent.EventType] = new HashSet<Guid> {insightEvent.UserId};
+                EventUserCounts[walkedEvent.Event.EventType] = new HashSet<Guid> {walkedEvent.Event.UserId};
             }
         }
 

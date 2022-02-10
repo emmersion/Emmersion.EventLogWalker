@@ -24,10 +24,10 @@ namespace Emmersion.EventLogWalker.UnitTests
         {
             var walkState = new WalkState
             {
-                Events = new List<InsightEvent>
+                Events = new List<WalkedEvent>
                 {
-                    new InsightEvent(),
-                    new InsightEvent()
+                    new WalkedEvent(),
+                    new WalkedEvent()
                 }
             };
 
@@ -53,10 +53,10 @@ namespace Emmersion.EventLogWalker.UnitTests
             var walkState = new WalkState
             {
                 PageEventIndex = 0,
-                Events = new List<InsightEvent>
+                Events = new List<WalkedEvent>
                 {
-                    new InsightEvent(),
-                    new InsightEvent()
+                    new WalkedEvent(),
+                    new WalkedEvent()
                 }
             };
 
@@ -70,11 +70,11 @@ namespace Emmersion.EventLogWalker.UnitTests
             var walkState = new WalkState
             {
                 PageEventIndex = 2,
-                Events = new List<InsightEvent>
+                Events = new List<WalkedEvent>
                 {
-                    new InsightEvent(),
-                    new InsightEvent(),
-                    new InsightEvent()
+                    new WalkedEvent(),
+                    new WalkedEvent(),
+                    new WalkedEvent()
                 }
             };
 
@@ -88,11 +88,11 @@ namespace Emmersion.EventLogWalker.UnitTests
             var walkState = new WalkState
             {
                 PageEventIndex = 3,
-                Events = new List<InsightEvent>
+                Events = new List<WalkedEvent>
                 {
-                    new InsightEvent(),
-                    new InsightEvent(),
-                    new InsightEvent()
+                    new WalkedEvent(),
+                    new WalkedEvent(),
+                    new WalkedEvent()
                 }
             };
 
@@ -106,11 +106,11 @@ namespace Emmersion.EventLogWalker.UnitTests
             var walkState = new WalkState
             {
                 PageEventIndex = 1,
-                Events = new List<InsightEvent>
+                Events = new List<WalkedEvent>
                 {
-                    new InsightEvent(),
-                    new InsightEvent(),
-                    new InsightEvent()
+                    new WalkedEvent(),
+                    new WalkedEvent(),
+                    new WalkedEvent()
                 }
             };
 
@@ -124,7 +124,7 @@ namespace Emmersion.EventLogWalker.UnitTests
             var walkState = new WalkState
             {
                 PageEventIndex = 0,
-                Events = new List<InsightEvent>()
+                Events = new List<WalkedEvent>()
             };
 
             var status = new EventLogWalkerStatus(walkState, null);

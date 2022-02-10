@@ -25,13 +25,13 @@ namespace ExampleReports
             
             var finalStatus = await walker.WalkAsync(new WalkArgs(), (insightEvent, status) =>
             {
-                if (eventCounts.ContainsKey(insightEvent.EventType))
+                if (eventCounts.ContainsKey(insightEvent.Event.EventType))
                 {
-                    eventCounts[insightEvent.EventType] += 1;
+                    eventCounts[insightEvent.Event.EventType] += 1;
                 }
                 else
                 {
-                    eventCounts[insightEvent.EventType] = 1;
+                    eventCounts[insightEvent.Event.EventType] = 1;
                 }
             });
             

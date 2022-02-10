@@ -8,14 +8,14 @@ namespace Emmersion.EventLogWalker.UnitTests
         [Test]
         public async Task When_processing_an_event_async()
         {
-            var insightEvent = new InsightEvent();
+            var insightEvent = new WalkedEvent();
             var status = new EventLogWalkerStatus(null, null);
 
-            InsightEvent capturedInsightEvent = null;
+            WalkedEvent capturedWalkedEvent = null;
             IEventLogWalkerStatus capturedStatus = null;
             var eventProcessor = new EventProcessor((xEvent, xStatus) =>
             {
-                capturedInsightEvent = xEvent;
+                capturedWalkedEvent = xEvent;
                 capturedStatus = xStatus;
 
                 return Task.CompletedTask;
@@ -23,27 +23,27 @@ namespace Emmersion.EventLogWalker.UnitTests
 
             await eventProcessor.ProcessEventAsync(insightEvent, status);
 
-            Assert.That(capturedInsightEvent, Is.SameAs(insightEvent));
+            Assert.That(capturedWalkedEvent, Is.SameAs(insightEvent));
             Assert.That(capturedStatus, Is.SameAs(status));
         }
 
         [Test]
         public async Task When_processing_an_event_synchronous()
         {
-            var insightEvent = new InsightEvent();
+            var insightEvent = new WalkedEvent();
             var status = new EventLogWalkerStatus(null, null);
 
-            InsightEvent capturedInsightEvent = null;
+            WalkedEvent capturedWalkedEvent = null;
             IEventLogWalkerStatus capturedStatus = null;
             var eventProcessor = new EventProcessor((xEvent, xStatus) =>
             {
-                capturedInsightEvent = xEvent;
+                capturedWalkedEvent = xEvent;
                 capturedStatus = xStatus;
             });
 
             await eventProcessor.ProcessEventAsync(insightEvent, status);
 
-            Assert.That(capturedInsightEvent, Is.SameAs(insightEvent));
+            Assert.That(capturedWalkedEvent, Is.SameAs(insightEvent));
             Assert.That(capturedStatus, Is.SameAs(status));
         }
     }

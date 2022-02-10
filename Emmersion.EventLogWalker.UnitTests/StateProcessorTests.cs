@@ -16,10 +16,10 @@ namespace Emmersion.EventLogWalker.UnitTests
             var initialState = new WalkState
             {
                 PageNumber = pageNumber,
-                Events = new List<InsightEvent>
+                Events = new List<WalkedEvent>
                 {
-                    new InsightEvent(),
-                    new InsightEvent()
+                    new WalkedEvent(),
+                    new WalkedEvent()
                 },
                 Cursor = new Cursor(),
                 PreviousCursor = new Cursor(),
@@ -32,9 +32,9 @@ namespace Emmersion.EventLogWalker.UnitTests
             var mockEventProcessor = GetMock<IEventProcessor>();
 
             mockEventProcessor.Setup(x => x.ProcessEventAsync(initialState.Events[0], IsAny<IEventLogWalkerStatus>()))
-                .Callback<InsightEvent, IEventLogWalkerStatus>((_, status) => capturedStatus1 = status);
+                .Callback<WalkedEvent, IEventLogWalkerStatus>((_, status) => capturedStatus1 = status);
             mockEventProcessor.Setup(x => x.ProcessEventAsync(initialState.Events[1], IsAny<IEventLogWalkerStatus>()))
-                .Callback<InsightEvent, IEventLogWalkerStatus>((_, status) => capturedStatus2 = status);
+                .Callback<WalkedEvent, IEventLogWalkerStatus>((_, status) => capturedStatus2 = status);
 
             var finalState =
                 await ClassUnderTest.ProcessStateAsync(mockEventProcessor.Object, initialState);
@@ -68,10 +68,10 @@ namespace Emmersion.EventLogWalker.UnitTests
         {
             var initialState = new WalkState
             {
-                Events = new List<InsightEvent>
+                Events = new List<WalkedEvent>
                 {
-                    new InsightEvent(),
-                    new InsightEvent()
+                    new WalkedEvent(),
+                    new WalkedEvent()
                 },
                 PageNumber = 2,
                 Cursor = new Cursor(),
@@ -84,7 +84,7 @@ namespace Emmersion.EventLogWalker.UnitTests
             var mockEventProcessor = GetMock<IEventProcessor>();
 
             mockEventProcessor.Setup(x => x.ProcessEventAsync(initialState.Events[1], IsAny<IEventLogWalkerStatus>()))
-                .Callback<InsightEvent, IEventLogWalkerStatus>((_, status) => capturedStatus = status);
+                .Callback<WalkedEvent, IEventLogWalkerStatus>((_, status) => capturedStatus = status);
 
             var finalState =
                 await ClassUnderTest.ProcessStateAsync(mockEventProcessor.Object, initialState);
@@ -105,10 +105,10 @@ namespace Emmersion.EventLogWalker.UnitTests
             var exception = new Exception();
             var initialState = new WalkState
             {
-                Events = new List<InsightEvent>
+                Events = new List<WalkedEvent>
                 {
-                    new InsightEvent(),
-                    new InsightEvent()
+                    new WalkedEvent(),
+                    new WalkedEvent()
                 },
                 Cursor = new Cursor(),
                 PreviousCursor = new Cursor(),
@@ -118,7 +118,7 @@ namespace Emmersion.EventLogWalker.UnitTests
             IEventLogWalkerStatus capturedStatus = null;
             var mockEventProcessor = GetMock<IEventProcessor>();
             mockEventProcessor.Setup(x => x.ProcessEventAsync(initialState.Events[0], IsAny<IEventLogWalkerStatus>()))
-                .Callback<InsightEvent, IEventLogWalkerStatus>((_, status) => capturedStatus = status)
+                .Callback<WalkedEvent, IEventLogWalkerStatus>((_, status) => capturedStatus = status)
                 .Throws(exception);
 
             var finalState = await ClassUnderTest.ProcessStateAsync(mockEventProcessor.Object, initialState);

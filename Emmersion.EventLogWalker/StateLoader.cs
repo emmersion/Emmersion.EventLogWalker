@@ -14,12 +14,12 @@ namespace Emmersion.EventLogWalker
 
     internal class StateLoader : IStateLoader
     {
-        private readonly IInsightsSystemApi insightsSystemApi;
+        private readonly IPager pager;
         private readonly IJsonSerializer jsonSerializer;
 
-        public StateLoader(IInsightsSystemApi insightsSystemApi, IJsonSerializer jsonSerializer)
+        public StateLoader(IPager pager, IJsonSerializer jsonSerializer)
         {
-            this.insightsSystemApi = insightsSystemApi;
+            this.pager = pager;
             this.jsonSerializer = jsonSerializer;
         }
 
@@ -59,7 +59,7 @@ namespace Emmersion.EventLogWalker
                 {
                     Cursor = cursor,
                     PreviousCursor = resumeToken?.Cursor,
-                    Events = new List<InsightEvent>(),
+                    Events = new List<WalkedEvent>(),
                     PageEventIndex = resumeToken?.PageEventIndex ?? 0,
                     PageNumber = resumeToken?.PageNumber ?? 1,
                     TotalEventsProcessed = resumeToken?.TotalProcessedEvents ?? 0,
@@ -78,7 +78,7 @@ namespace Emmersion.EventLogWalker
                     {
                         Cursor = null,
                         PreviousCursor = previousState.PreviousCursor,
-                        Events = new List<InsightEvent>(),
+                        Events = new List<WalkedEvent>(),
                         PageEventIndex = 0,
                         PageNumber = previousState.PageNumber + 1,
                         TotalEventsProcessed = previousState.TotalEventsProcessed
@@ -104,7 +104,7 @@ namespace Emmersion.EventLogWalker
 
         private async Task<WalkState> LoadStateFromPageAsync(WalkState previousState)
         {
-            var page = await insightsSystemApi.GetPageAsync(previousState.Cursor);
+            var page = await pager.GetPageAsync(previousState.Cursor);
 
             return new WalkState
             {

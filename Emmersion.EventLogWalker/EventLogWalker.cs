@@ -6,8 +6,8 @@ namespace Emmersion.EventLogWalker
 {
     public interface IEventLogWalker
     {
-        Task<IEventLogWalkerStatus> WalkAsync(WalkArgs args, Func<InsightEvent, IEventLogWalkerStatus, Task> eventProcessor);
-        Task<IEventLogWalkerStatus> WalkAsync(WalkArgs args, Action<InsightEvent, IEventLogWalkerStatus> eventProcessor);
+        Task<IEventLogWalkerStatus> WalkAsync(WalkArgs args, Func<WalkedEvent, IEventLogWalkerStatus, Task> eventProcessor);
+        Task<IEventLogWalkerStatus> WalkAsync(WalkArgs args, Action<WalkedEvent, IEventLogWalkerStatus> eventProcessor);
     }
 
     internal class EventLogWalker : IEventLogWalker
@@ -26,12 +26,12 @@ namespace Emmersion.EventLogWalker
             resourceThrottle.MinimumDurationBetweenAccess = TimeSpan.FromSeconds(1);
         }
 
-        public Task<IEventLogWalkerStatus> WalkAsync(WalkArgs args, Func<InsightEvent, IEventLogWalkerStatus, Task> eventProcessor)
+        public Task<IEventLogWalkerStatus> WalkAsync(WalkArgs args, Func<WalkedEvent, IEventLogWalkerStatus, Task> eventProcessor)
         {
             return WalkAsync(args, new EventProcessor(eventProcessor));
         }
 
-        public Task<IEventLogWalkerStatus> WalkAsync(WalkArgs args, Action<InsightEvent, IEventLogWalkerStatus> eventProcessor)
+        public Task<IEventLogWalkerStatus> WalkAsync(WalkArgs args, Action<WalkedEvent, IEventLogWalkerStatus> eventProcessor)
         {
             return WalkAsync(args, new EventProcessor(eventProcessor));
         }

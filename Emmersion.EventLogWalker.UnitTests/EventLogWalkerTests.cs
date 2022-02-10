@@ -30,30 +30,30 @@ namespace Emmersion.EventLogWalker.UnitTests
             var initialState = new WalkState
             {
                 Cursor = new Cursor(),
-                Events = new List<InsightEvent>
+                Events = new List<WalkedEvent>
                 {
-                    new InsightEvent(),
-                    new InsightEvent()
+                    new WalkedEvent(),
+                    new WalkedEvent()
                 }
             };
             var state2 = new WalkState();
             var state3 = new WalkState
             {
-                Events = new List<InsightEvent>
+                Events = new List<WalkedEvent>
                 {
-                    new InsightEvent(),
-                    new InsightEvent()
+                    new WalkedEvent(),
+                    new WalkedEvent()
                 },
                 Cursor = new Cursor()
             };
             var state4 = new WalkState();
             var finalState = new WalkState
             {
-                Events = new List<InsightEvent>(),
+                Events = new List<WalkedEvent>(),
                 Cursor = null
             };
             var eventProcessorFuncWasCalled = false;
-            Func<InsightEvent, IEventLogWalkerStatus, Task> eventProcessorFunc = (xEvent, xStatus) =>
+            Func<WalkedEvent, IEventLogWalkerStatus, Task> eventProcessorFunc = (xEvent, xStatus) =>
             {
                 eventProcessorFuncWasCalled = true;
                 return Task.CompletedTask;
@@ -100,10 +100,10 @@ namespace Emmersion.EventLogWalker.UnitTests
             var initialState = new WalkState
             {
                 Cursor = new Cursor(),
-                Events = new List<InsightEvent>
+                Events = new List<WalkedEvent>
                 {
-                    new InsightEvent(),
-                    new InsightEvent()
+                    new WalkedEvent(),
+                    new WalkedEvent()
                 }
             };
             var state2 = new WalkState
@@ -111,7 +111,7 @@ namespace Emmersion.EventLogWalker.UnitTests
                 Exception = new Exception(RandomString())
             };
             var eventProcessorFuncWasCalled = false;
-            Action<InsightEvent, IEventLogWalkerStatus> eventProcessorFunc = (xEvent, xStatus) =>
+            Action<WalkedEvent, IEventLogWalkerStatus> eventProcessorFunc = (xEvent, xStatus) =>
             {
                 eventProcessorFuncWasCalled = true;
             };
@@ -142,17 +142,17 @@ namespace Emmersion.EventLogWalker.UnitTests
             var resumingInitialState = new WalkState
             {
                 Cursor = null,
-                Events = new List<InsightEvent>
+                Events = new List<WalkedEvent>
                 {
-                    new InsightEvent(),
-                    new InsightEvent()
+                    new WalkedEvent(),
+                    new WalkedEvent()
                 }
             };
 
             var state1 = new WalkState();
             var finalState = new WalkState
             {
-                Events = new List<InsightEvent>()
+                Events = new List<WalkedEvent>()
             };
 
             GetMock<IStateLoader>().Setup(x =>
@@ -178,7 +178,7 @@ namespace Emmersion.EventLogWalker.UnitTests
             var initialStateWithError = new WalkState
             {
                 Cursor = new Cursor(),
-                Events = new List<InsightEvent>(),
+                Events = new List<WalkedEvent>(),
                 Exception = new Exception(RandomString())
             };
 
@@ -206,10 +206,10 @@ namespace Emmersion.EventLogWalker.UnitTests
             var initialState = new WalkState
             {
                 Cursor = new Cursor(),
-                Events = new List<InsightEvent>
+                Events = new List<WalkedEvent>
                 {
-                    new InsightEvent(),
-                    new InsightEvent()
+                    new WalkedEvent(),
+                    new WalkedEvent()
                 }
             };
 
@@ -244,20 +244,20 @@ namespace Emmersion.EventLogWalker.UnitTests
             var initialState = new WalkState
             {
                 Cursor = new Cursor(),
-                Events = new List<InsightEvent>
+                Events = new List<WalkedEvent>
                 {
-                    new InsightEvent(),
-                    new InsightEvent()
+                    new WalkedEvent(),
+                    new WalkedEvent()
                 }
             };
 
             var state2 = new WalkState
             {
                 Cursor = new Cursor(),
-                Events = new List<InsightEvent>
+                Events = new List<WalkedEvent>
                 {
-                    new InsightEvent(),
-                    new InsightEvent()
+                    new WalkedEvent(),
+                    new WalkedEvent()
                 }
             };
 

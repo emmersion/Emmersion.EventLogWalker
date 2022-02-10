@@ -48,12 +48,12 @@ namespace ExampleReports
                     }
 
 
-                    if (eventIds.Contains(insightEvent.Id))
+                    if (eventIds.Contains(insightEvent.Event.Id))
                     {
-                        throw new Exception($"The id {insightEvent.Id} was processed twice.");
+                        throw new Exception($"The id {insightEvent.Event.Id} was processed twice.");
                     }
 
-                    eventIds.Add(insightEvent.Id);
+                    eventIds.Add(insightEvent.Event.Id);
                 });
 
             if (finalStatus.Exception != null)

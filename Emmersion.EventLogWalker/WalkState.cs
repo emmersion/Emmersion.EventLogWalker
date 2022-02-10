@@ -5,7 +5,7 @@ namespace Emmersion.EventLogWalker
 {
     internal class WalkState
     {
-        public List<InsightEvent> Events { get; set; } = new List<InsightEvent>();
+        public List<WalkedEvent> Events { get; set; } = new List<WalkedEvent>();
         public Cursor Cursor { get; set; }
         public Cursor PreviousCursor { get; set; }
         public int PageEventIndex { get; set; }

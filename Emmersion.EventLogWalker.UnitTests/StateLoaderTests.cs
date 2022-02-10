@@ -18,15 +18,15 @@ namespace Emmersion.EventLogWalker.UnitTests
             var page = new Page
             {
                 NextPage = new Cursor(),
-                Events = new List<InsightEvent>
+                Events = new List<WalkedEvent>
                 {
-                    new InsightEvent(),
-                    new InsightEvent()
+                    new WalkedEvent(),
+                    new WalkedEvent()
                 }
             };
             Cursor capturedCursor = null;
 
-            GetMock<IInsightsSystemApi>().Setup(x => x.GetPageAsync(IsAny<Cursor>()))
+            GetMock<IPager>().Setup(x => x.GetPageAsync(IsAny<Cursor>()))
                 .Callback<Cursor>(cursor => capturedCursor = cursor)
                 .ReturnsAsync(page);
 
@@ -58,17 +58,17 @@ namespace Emmersion.EventLogWalker.UnitTests
             var resumeTokenJson = RandomString();
             var page = new Page
             {
-                Events = new List<InsightEvent>
+                Events = new List<WalkedEvent>
                 {
-                    new InsightEvent(),
-                    new InsightEvent()
+                    new WalkedEvent(),
+                    new WalkedEvent()
                 },
                 NextPage = new Cursor()
             };
 
             GetMock<IJsonSerializer>().Setup(x => x.Deserialize<ResumeToken>(resumeTokenJson))
                 .Returns(resumeToken);
-            GetMock<IInsightsSystemApi>().Setup(x => x.GetPageAsync(resumeToken.Cursor))
+            GetMock<IPager>().Setup(x => x.GetPageAsync(resumeToken.Cursor))
                 .ReturnsAsync(page);
 
             var state = await ClassUnderTest.LoadInitialStateAsync(startInclusive, endExclusive, resumeTokenJson);
@@ -97,10 +97,10 @@ namespace Emmersion.EventLogWalker.UnitTests
             var resumeTokenJson = RandomString();
             var page = new Page
             {
-                Events = new List<InsightEvent>
+                Events = new List<WalkedEvent>
                 {
-                    new InsightEvent(),
-                    new InsightEvent()
+                    new WalkedEvent(),
+                    new WalkedEvent()
                 },
                 NextPage = new Cursor()
             };
@@ -108,7 +108,7 @@ namespace Emmersion.EventLogWalker.UnitTests
             GetMock<IJsonSerializer>().Setup(x => x.Deserialize<ResumeToken>(resumeTokenJson))
                 .Returns(resumeToken);
             Cursor capturedCursor = null;
-            GetMock<IInsightsSystemApi>().Setup(x => x.GetPageAsync(IsAny<Cursor>()))
+            GetMock<IPager>().Setup(x => x.GetPageAsync(IsAny<Cursor>()))
                 .Callback<Cursor>(cursor => capturedCursor = cursor)
                 .ReturnsAsync(page);
 
@@ -130,7 +130,7 @@ namespace Emmersion.EventLogWalker.UnitTests
             var start = DateTimeOffset.UtcNow.AddDays(-1);
             var end = DateTimeOffset.UtcNow;
 
-            GetMock<IInsightsSystemApi>().Setup(x => x.GetPageAsync(IsAny<Cursor>())).Throws(exception);
+            GetMock<IPager>().Setup(x => x.GetPageAsync(IsAny<Cursor>())).Throws(exception);
 
             var state = await ClassUnderTest.LoadInitialStateAsync(start, end, null);
 
@@ -161,7 +161,7 @@ namespace Emmersion.EventLogWalker.UnitTests
 
             GetMock<IJsonSerializer>().Setup(x => x.Deserialize<ResumeToken>(resumeTokenJson))
                 .Returns(resumeToken);
-            GetMock<IInsightsSystemApi>().Setup(x => x.GetPageAsync(IsAny<Cursor>())).Throws(exception);
+            GetMock<IPager>().Setup(x => x.GetPageAsync(IsAny<Cursor>())).Throws(exception);
 
             var state = await ClassUnderTest.LoadInitialStateAsync(start, end, resumeTokenJson);
 
@@ -181,10 +181,10 @@ namespace Emmersion.EventLogWalker.UnitTests
             {
                 PageNumber = 1,
                 TotalEventsProcessed = 2,
-                Events = new List<InsightEvent>
+                Events = new List<WalkedEvent>
                 {
-                    new InsightEvent(),
-                    new InsightEvent()
+                    new WalkedEvent(),
+                    new WalkedEvent()
                 },
                 Cursor = new Cursor(),
                 PreviousCursor = new Cursor()
@@ -192,14 +192,14 @@ namespace Emmersion.EventLogWalker.UnitTests
             var page = new Page
             {
                 NextPage = new Cursor(),
-                Events = new List<InsightEvent>
+                Events = new List<WalkedEvent>
                 {
-                    new InsightEvent(),
-                    new InsightEvent()
+                    new WalkedEvent(),
+                    new WalkedEvent()
                 }
             };
 
-            GetMock<IInsightsSystemApi>().Setup(x => x.GetPageAsync(previousState.Cursor))
+            GetMock<IPager>().Setup(x => x.GetPageAsync(previousState.Cursor))
                 .ReturnsAsync(page);
 
             var state = await ClassUnderTest.LoadNextStateAsync(previousState);
@@ -219,10 +219,10 @@ namespace Emmersion.EventLogWalker.UnitTests
             {
                 PageNumber = 1,
                 TotalEventsProcessed = 2,
-                Events = new List<InsightEvent>
+                Events = new List<WalkedEvent>
                 {
-                    new InsightEvent(),
-                    new InsightEvent()
+                    new WalkedEvent(),
+                    new WalkedEvent()
                 },
                 Cursor = null,
                 PreviousCursor = new Cursor()
@@ -230,7 +230,7 @@ namespace Emmersion.EventLogWalker.UnitTests
             
             var state = await ClassUnderTest.LoadNextStateAsync(previousState);
 
-            GetMock<IInsightsSystemApi>().VerifyNever(x => x.GetPageAsync(IsAny<Cursor>()));
+            GetMock<IPager>().VerifyNever(x => x.GetPageAsync(IsAny<Cursor>()));
 
             Assert.That(state.Cursor, Is.Null);
             Assert.That(state.PreviousCursor, Is.EqualTo(previousState.PreviousCursor));
@@ -247,17 +247,17 @@ namespace Emmersion.EventLogWalker.UnitTests
             {
                 PageNumber = 1,
                 TotalEventsProcessed = 2,
-                Events = new List<InsightEvent>
+                Events = new List<WalkedEvent>
                 {
-                    new InsightEvent(),
-                    new InsightEvent()
+                    new WalkedEvent(),
+                    new WalkedEvent()
                 },
                 Cursor = new Cursor(),
                 PreviousCursor = new Cursor()
             };
             var exception = new Exception(RandomString());
 
-            GetMock<IInsightsSystemApi>().Setup(x => x.GetPageAsync(IsAny<Cursor>()))
+            GetMock<IPager>().Setup(x => x.GetPageAsync(IsAny<Cursor>()))
                 .Throws(exception);
 
             var state = await ClassUnderTest.LoadNextStateAsync(previousState);
