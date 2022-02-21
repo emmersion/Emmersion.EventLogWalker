@@ -6,9 +6,9 @@ namespace Emmersion.EventLogWalker
 {
     public interface IEventLogWalker
     {
-        Task<IEventLogWalkerStatus> WalkAsync<TEvent>(WalkArgs args, Func<TEvent, IEventLogWalkerStatus, Task> eventProcessor)
+        Task<IEventLogWalkerStatus> WalkAsync<TEvent>(IPager<TEvent> pager, WalkArgs args, Func<TEvent, IEventLogWalkerStatus, Task> eventProcessor)
             where TEvent : class;
-        Task<IEventLogWalkerStatus> WalkAsync<TEvent>(WalkArgs args, Action<TEvent, IEventLogWalkerStatus> eventProcessor)
+        Task<IEventLogWalkerStatus> WalkAsync<TEvent>(IPager<TEvent> pager, WalkArgs args, Action<TEvent, IEventLogWalkerStatus> eventProcessor)
             where TEvent : class;
     }
 
@@ -28,22 +28,22 @@ namespace Emmersion.EventLogWalker
             resourceThrottle.MinimumDurationBetweenAccess = TimeSpan.FromSeconds(1);
         }
 
-        public Task<IEventLogWalkerStatus> WalkAsync<TEvent>(WalkArgs args, Func<TEvent, IEventLogWalkerStatus, Task> eventProcessor)
+        public Task<IEventLogWalkerStatus> WalkAsync<TEvent>(IPager<TEvent> pager, WalkArgs args, Func<TEvent, IEventLogWalkerStatus, Task> eventProcessor)
             where TEvent : class
         {
-            return WalkAsync(args, new EventProcessor<TEvent>(eventProcessor));
+            return WalkAsync(pager, args, new EventProcessor<TEvent>(eventProcessor));
         }
 
-        public Task<IEventLogWalkerStatus> WalkAsync<TEvent>(WalkArgs args, Action<TEvent, IEventLogWalkerStatus> eventProcessor)
+        public Task<IEventLogWalkerStatus> WalkAsync<TEvent>(IPager<TEvent> pager, WalkArgs args, Action<TEvent, IEventLogWalkerStatus> eventProcessor)
             where TEvent : class
         {
-            return WalkAsync(args, new EventProcessor<TEvent>(eventProcessor));
+            return WalkAsync(pager, args, new EventProcessor<TEvent>(eventProcessor));
         }
 
-        private async Task<IEventLogWalkerStatus> WalkAsync<TEvent>(WalkArgs args, IEventProcessor<TEvent> eventProcessor)
+        private async Task<IEventLogWalkerStatus> WalkAsync<TEvent>(IPager<TEvent> pager, WalkArgs args, IEventProcessor<TEvent> eventProcessor)
             where TEvent : class
         {
-            var state = await stateLoader.LoadInitialStateAsync(args.StartInclusive, args.EndExclusive, args.ResumeToken);
+            var state = await stateLoader.LoadInitialStateAsync(pager, args.StartInclusive, args.EndExclusive, args.ResumeToken);
 
             while (state.Events.Any() && state.Exception == null)
             {
@@ -56,10 +56,10 @@ namespace Emmersion.EventLogWalker
                 }
 
                 await resourceThrottle.WaitForNextAccessAsync();
-                state = await stateLoader.LoadNextStateAsync(state);
+                state = await stateLoader.LoadNextStateAsync(pager, state);
             }
 
-            return new EventLogWalkerStatus(state, jsonSerializer);
+            return new EventLogWalkerStatus<TEvent>(state, jsonSerializer);
         }
     }
 

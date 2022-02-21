@@ -5,7 +5,7 @@ namespace Emmersion.EventLogWalker
 {
     internal interface IStateProcessor
     {
-        Task<WalkState> ProcessStateAsync<TEvent>(IEventProcessor<TEvent> eventProcessor, WalkState state)
+        Task<WalkState<TEvent>> ProcessStateAsync<TEvent>(IEventProcessor<TEvent> eventProcessor, WalkState<TEvent> state)
             where TEvent : class;
     }
 
@@ -18,7 +18,7 @@ namespace Emmersion.EventLogWalker
             this.jsonSerializer = jsonSerializer;
         }
 
-        public async Task<WalkState> ProcessStateAsync<TEvent>(IEventProcessor<TEvent> eventProcessor, WalkState state)
+        public async Task<WalkState<TEvent>> ProcessStateAsync<TEvent>(IEventProcessor<TEvent> eventProcessor, WalkState<TEvent> state)
             where TEvent : class
         {
             var processedEvents = 0;
@@ -27,7 +27,7 @@ namespace Emmersion.EventLogWalker
             {
                 try
                 {
-                    walkStateInProgress = new WalkState
+                    walkStateInProgress = new WalkState<TEvent>
                     {
                         Events = state.Events,
                         Cursor = state.Cursor,
@@ -37,13 +37,13 @@ namespace Emmersion.EventLogWalker
                         TotalEventsProcessed = state.TotalEventsProcessed + processedEvents
                     };
 
-                    await eventProcessor.ProcessEventAsync(state.Events[i].Event as TEvent,
-                        new EventLogWalkerStatus(walkStateInProgress, jsonSerializer));
+                    await eventProcessor.ProcessEventAsync(state.Events[i],
+                        new EventLogWalkerStatus<TEvent>(walkStateInProgress, jsonSerializer));
                     processedEvents++;
                 }
                 catch (Exception exception)
                 {
-                    return new WalkState
+                    return new WalkState<TEvent>
                     {
                         Events = walkStateInProgress.Events,
                         Cursor = walkStateInProgress.Cursor,
@@ -56,7 +56,7 @@ namespace Emmersion.EventLogWalker
                 }
             }
 
-            return new WalkState
+            return new WalkState<TEvent>
             {
                 Events = state.Events,
                 Cursor = state.Cursor,

@@ -13,12 +13,13 @@ namespace Emmersion.EventLogWalker
         string GetResumeToken();
     }
 
-    internal class EventLogWalkerStatus : IEventLogWalkerStatus
+    internal class EventLogWalkerStatus<TEvent> : IEventLogWalkerStatus
+        where TEvent : class
     {
-        private readonly WalkState state;
+        private readonly WalkState<TEvent> state;
         private readonly IJsonSerializer jsonSerializer;
 
-        public EventLogWalkerStatus(WalkState state, IJsonSerializer jsonSerializer)
+        public EventLogWalkerStatus(WalkState<TEvent> state, IJsonSerializer jsonSerializer)
         {
             this.state = state;
             this.jsonSerializer = jsonSerializer;

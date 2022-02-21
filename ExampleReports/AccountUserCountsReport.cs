@@ -21,15 +21,17 @@ namespace ExampleReports
         private readonly ICsvWriter csvWriter;
         private readonly IJsonSerializer jsonSerializer;
         private readonly IFileSystem fileSystem;
+        private readonly IPager<InsightEvent> pager;
         private readonly TimeTracker eventTimeTracker;
 
         public AccountUserCountsReport(IEventLogWalker eventLogWalker, ICsvWriter csvWriter,
-            IJsonSerializer jsonSerializer, IFileSystem fileSystem)
+            IJsonSerializer jsonSerializer, IFileSystem fileSystem, IPager<InsightEvent> pager)
         {
             this.eventLogWalker = eventLogWalker;
             this.csvWriter = csvWriter;
             this.jsonSerializer = jsonSerializer;
             this.fileSystem = fileSystem;
+            this.pager = pager;
 
             eventTimeTracker = new TimeTracker(1);
         }
@@ -53,7 +55,7 @@ args =>
             var resumeToken = LoadState();
 
             //  NOTE: See ExampleReports.Configuration.DependencyInjectionConfig to understand the package dependency needs
-            var status = await eventLogWalker.WalkAsync<InsightEvent>(
+            var status = await eventLogWalker.WalkAsync(pager,
                 new WalkArgs
                 {
                     StartInclusive = reportPeriodStartInclusive,

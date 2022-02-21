@@ -4,20 +4,16 @@ using System.Threading.Tasks;
 
 namespace Emmersion.EventLogWalker
 {
-    public interface IPager
+    public interface IPager<TEvent>
+        where TEvent : class
     {
-        Task<Page> GetPageAsync(Cursor cursor);
+        Task<Page<TEvent>> GetPageAsync(Cursor cursor);
     }
 
-    public class Page
+    public class Page<TEvent>
     {
-        public List<WalkedEvent> Events { get; set; }
+        public List<TEvent> Events { get; set; }
         public Cursor NextPage { get; set; }
-    }
-
-    public class WalkedEvent
-    {
-        public object Event { get; set; }
     }
 
     public class Cursor

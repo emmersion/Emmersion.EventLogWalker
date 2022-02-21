@@ -20,7 +20,7 @@ namespace Emmersion.EventLogWalker.UnitTests
             var insightsSystemApiBaseUrl = RandomString();
             var insightsSystemApiApiKey = RandomString();
             var serializedApiPage = RandomString();
-            var deserializedApiPage = new InsightsPage
+            var deserializedApiPage = new Page<InsightEvent>
             {
                 Events = new List<InsightEvent>
                 {
@@ -36,7 +36,7 @@ namespace Emmersion.EventLogWalker.UnitTests
             GetMock<IHttpClient>().Setup(x => x.ExecutePostAsync(IsAny<IHttpRequest>()))
                 .Callback<IHttpRequest>(httpRequest => capturedHttpRequest = httpRequest as HttpRequest)
                 .ReturnsAsync(new HttpResponse(200, new HttpHeaders(), serializedApiPage));
-            GetMock<IJsonSerializer>().Setup(x => x.Deserialize<InsightsPage>(serializedApiPage)).Returns(deserializedApiPage);
+            GetMock<IJsonSerializer>().Setup(x => x.Deserialize<Page<InsightEvent>>(serializedApiPage)).Returns(deserializedApiPage);
             GetMock<IJsonSerializer>().Setup(x => x.Serialize(cursor)).Returns(cursorJson);
 
             var page = await ClassUnderTest.GetPageAsync(cursor);
@@ -49,7 +49,7 @@ namespace Emmersion.EventLogWalker.UnitTests
             Assert.That(capturedHttpRequest.Headers.GetValue("Content-Type"), Is.EqualTo("application/json"));
             Assert.That(capturedHttpRequest.Body, Is.EqualTo(cursorJson));
             Assert.That(page.Events.Count, Is.EqualTo(deserializedApiPage.Events.Count));
-            Assert.That(page.Events.Single().Event, Is.SameAs(deserializedApiPage.Events.Single()));
+            Assert.That(page.Events.Single(), Is.SameAs(deserializedApiPage.Events.Single()));
             Assert.That(page.NextPage, Is.SameAs(deserializedApiPage.NextPage));
         }
 

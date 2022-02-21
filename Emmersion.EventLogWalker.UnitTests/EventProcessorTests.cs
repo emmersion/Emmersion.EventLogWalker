@@ -9,7 +9,7 @@ namespace Emmersion.EventLogWalker.UnitTests
         public async Task When_processing_an_event_async()
         {
             var insightEvent = new InsightEvent();
-            var status = new EventLogWalkerStatus(null, null);
+            var status = new EventLogWalkerStatus<InsightEvent>(null, null);
 
             InsightEvent capturedInsightEvent = null;
             IEventLogWalkerStatus capturedStatus = null;
@@ -31,7 +31,7 @@ namespace Emmersion.EventLogWalker.UnitTests
         public async Task When_processing_an_event_synchronous()
         {
             var insightEvent = new InsightEvent();
-            var status = new EventLogWalkerStatus(null, null);
+            var status = new EventLogWalkerStatus<InsightEvent>(null, null);
 
             InsightEvent capturedInsightEvent = null;
             IEventLogWalkerStatus capturedStatus = null;

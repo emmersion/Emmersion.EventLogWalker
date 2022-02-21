@@ -13,18 +13,29 @@ namespace ExampleReports
     public class SimpleReport : ISimpleReport
     {
         private readonly IEventLogWalker walker;
+        private readonly IPager<InsightEvent> pager;
 
-        public SimpleReport(IEventLogWalker walker)
+        public SimpleReport(IEventLogWalker walker, IPager<InsightEvent> pager)
         {
             this.walker = walker;
+            this.pager = pager;
         }
 
         public async Task GenerateAsync()
         {
+            Console.WriteLine("WARNING: This report runs across the entire event log. This report is for example only. Recommend abort after a few events are processed.");
+
             var eventCounts = new Dictionary<string, int>();
-            
-            var finalStatus = await walker.WalkAsync<InsightEvent>(new WalkArgs(), (insightEvent, status) =>
+
+            var i = 0;
+            var finalStatus = await walker.WalkAsync(pager, new WalkArgs(), (insightEvent, status) =>
             {
+                i++;
+                if (i % 1000 == 0)
+                {
+                    Console.WriteLine($"Processed {i} events");
+                }
+
                 if (eventCounts.ContainsKey(insightEvent.EventType))
                 {
                     eventCounts[insightEvent.EventType] += 1;

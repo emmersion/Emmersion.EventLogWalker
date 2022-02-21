@@ -13,13 +13,13 @@ namespace Emmersion.EventLogWalker.UnitTests
         public async Task When_processing_state()
         {
             var pageNumber = 1;
-            var initialState = new WalkState
+            var initialState = new WalkState<InsightEvent>
             {
                 PageNumber = pageNumber,
-                Events = new List<WalkedEvent>
+                Events = new List<InsightEvent>
                 {
-                    new WalkedEvent{ Event = new InsightEvent() },
-                    new WalkedEvent{ Event = new InsightEvent() }
+                    new InsightEvent(),
+                    new InsightEvent()
                 },
                 Cursor = new Cursor(),
                 PreviousCursor = new Cursor(),
@@ -31,15 +31,15 @@ namespace Emmersion.EventLogWalker.UnitTests
 
             var mockEventProcessor = GetMock<IEventProcessor<InsightEvent>>();
 
-            mockEventProcessor.Setup(x => x.ProcessEventAsync((InsightEvent)initialState.Events[0].Event, IsAny<IEventLogWalkerStatus>()))
+            mockEventProcessor.Setup(x => x.ProcessEventAsync(initialState.Events[0], IsAny<IEventLogWalkerStatus>()))
                 .Callback<InsightEvent, IEventLogWalkerStatus>((_, status) => capturedStatus1 = status);
-            mockEventProcessor.Setup(x => x.ProcessEventAsync((InsightEvent)initialState.Events[1].Event, IsAny<IEventLogWalkerStatus>()))
+            mockEventProcessor.Setup(x => x.ProcessEventAsync(initialState.Events[1], IsAny<IEventLogWalkerStatus>()))
                 .Callback<InsightEvent, IEventLogWalkerStatus>((_, status) => capturedStatus2 = status);
 
             var finalState =
                 await ClassUnderTest.ProcessStateAsync(mockEventProcessor.Object, initialState);
 
-            GetMock<IJsonSerializer>().VerifyNever(x => x.Serialize(IsAny<WalkState>()));
+            GetMock<IJsonSerializer>().VerifyNever(x => x.Serialize(IsAny<WalkState<InsightEvent>>()));
 
             Assert.That(capturedStatus1.PageEventIndex, Is.EqualTo(0));
             Assert.That(capturedStatus1.PageNumber, Is.EqualTo(initialState.PageNumber));
@@ -66,12 +66,12 @@ namespace Emmersion.EventLogWalker.UnitTests
         [Test]
         public async Task When_resuming_state_processing()
         {
-            var initialState = new WalkState
+            var initialState = new WalkState<InsightEvent>
             {
-                Events = new List<WalkedEvent>
+                Events = new List<InsightEvent>
                 {
-                    new WalkedEvent{ Event = new InsightEvent() },
-                    new WalkedEvent{ Event = new InsightEvent() }
+                    new InsightEvent(),
+                    new InsightEvent()
                 },
                 PageNumber = 2,
                 Cursor = new Cursor(),
@@ -83,7 +83,7 @@ namespace Emmersion.EventLogWalker.UnitTests
 
             var mockEventProcessor = GetMock<IEventProcessor<InsightEvent>>();
 
-            mockEventProcessor.Setup(x => x.ProcessEventAsync((InsightEvent)initialState.Events[1].Event, IsAny<IEventLogWalkerStatus>()))
+            mockEventProcessor.Setup(x => x.ProcessEventAsync(initialState.Events[1], IsAny<IEventLogWalkerStatus>()))
                 .Callback<InsightEvent, IEventLogWalkerStatus>((_, status) => capturedStatus = status);
 
             var finalState =
@@ -103,12 +103,12 @@ namespace Emmersion.EventLogWalker.UnitTests
         public async Task When_processing_an_event_throws()
         {
             var exception = new Exception();
-            var initialState = new WalkState
+            var initialState = new WalkState<InsightEvent>
             {
-                Events = new List<WalkedEvent>
+                Events = new List<InsightEvent>
                 {
-                    new WalkedEvent(),
-                    new WalkedEvent()
+                    new InsightEvent(),
+                    new InsightEvent()
                 },
                 Cursor = new Cursor(),
                 PreviousCursor = new Cursor(),
@@ -117,7 +117,7 @@ namespace Emmersion.EventLogWalker.UnitTests
 
             IEventLogWalkerStatus capturedStatus = null;
             var mockEventProcessor = GetMock<IEventProcessor<InsightEvent>>();
-            mockEventProcessor.Setup(x => x.ProcessEventAsync((InsightEvent)initialState.Events[0].Event, IsAny<IEventLogWalkerStatus>()))
+            mockEventProcessor.Setup(x => x.ProcessEventAsync(initialState.Events[0], IsAny<IEventLogWalkerStatus>()))
                 .Callback<InsightEvent, IEventLogWalkerStatus>((_, status) => capturedStatus = status)
                 .Throws(exception);
 
@@ -138,11 +138,11 @@ namespace Emmersion.EventLogWalker.UnitTests
             Assert.That(finalState.PreviousCursor, Is.EqualTo(initialState.PreviousCursor));
         }
 
-        private WalkState GetPrivateStateOfStatus(IEventLogWalkerStatus status)
+        private WalkState<InsightEvent> GetPrivateStateOfStatus(IEventLogWalkerStatus status)
         {
-            var stateFieldInfo = typeof(EventLogWalkerStatus).GetField("state", BindingFlags.Instance | BindingFlags.NonPublic);
+            var stateFieldInfo = typeof(EventLogWalkerStatus<InsightEvent>).GetField("state", BindingFlags.Instance | BindingFlags.NonPublic);
 
-            return (WalkState)stateFieldInfo!.GetValue(status);
+            return (WalkState<InsightEvent>)stateFieldInfo!.GetValue(status);
         }
     }
 }
