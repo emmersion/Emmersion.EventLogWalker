@@ -28,7 +28,7 @@ namespace ExampleReports
             var eventCounts = new Dictionary<string, int>();
 
             var i = 0;
-            var finalStatus = await walker.WalkAsync(pager, new WalkArgs(), (insightEvent, status) =>
+            var finalStatus = await walker.WalkAsync(new WalkArgs<InsightEvent>{ Pager = pager }, (insightEvent, status) =>
             {
                 i++;
                 if (i % 1000 == 0)
