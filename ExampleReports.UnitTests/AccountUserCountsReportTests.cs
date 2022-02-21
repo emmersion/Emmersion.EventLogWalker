@@ -55,11 +55,13 @@ namespace ExampleReports.UnitTests
                     capturedRecords = records;
                 });
 
-            WalkArgs<InsightEvent> capturedWalkArgs = null;
+            IPager<InsightEvent> capturedPager = null;
+            WalkArgs capturedWalkArgs = null;
             Action<InsightEvent, IEventLogWalkerStatus> capturedFunc = null;
-            GetMock<IEventLogWalker>().Setup(x => x.WalkAsync(IsAny<WalkArgs<InsightEvent>>(), IsAny<Action<InsightEvent, IEventLogWalkerStatus>>()))
-                .Callback<WalkArgs<InsightEvent>, Action<InsightEvent, IEventLogWalkerStatus>>((args, func) =>
+            GetMock<IEventLogWalker>().Setup(x => x.WalkAsync(IsAny<IPager<InsightEvent>>(), IsAny<WalkArgs>(), IsAny<Action<InsightEvent, IEventLogWalkerStatus>>()))
+                .Callback<IPager<InsightEvent>, WalkArgs, Action<InsightEvent, IEventLogWalkerStatus>>((pager, args, func) =>
                 {
+                    capturedPager = pager;
                     capturedWalkArgs = args;
                     capturedFunc = func;
                 })
@@ -71,7 +73,7 @@ namespace ExampleReports.UnitTests
 
             GetMock<IFileSystem>().Verify(x => x.DeleteFile(AccountUserCountsReport.StateFilePath));
 
-            Assert.That(capturedWalkArgs.Pager, Is.EqualTo(expectedPager));
+            Assert.That(capturedPager, Is.EqualTo(expectedPager));
             Assert.That(capturedWalkArgs.StartInclusive, Is.EqualTo(reportPeriodStartInclusive));
             Assert.That(capturedWalkArgs.EndExclusive, Is.EqualTo(reportPeriodEndExclusive));
             Assert.That(capturedWalkArgs.ResumeToken, Is.Null);
@@ -105,9 +107,9 @@ namespace ExampleReports.UnitTests
             GetMock<IFileSystem>().Setup(x => x.ReadFile(AccountUserCountsReport.StateFilePath)).Returns(stateJson);
             GetMock<IJsonSerializer>().Setup(x => x.Deserialize<AccountUserCountsReportState>(stateJson)).Returns(reportState);
 
-            WalkArgs<InsightEvent> capturedWalkArgs = null;
-            GetMock<IEventLogWalker>().Setup(x => x.WalkAsync(IsAny<WalkArgs<InsightEvent>>(), IsAny<Action<InsightEvent, IEventLogWalkerStatus>>()))
-                .Callback<WalkArgs<InsightEvent>, Action<InsightEvent, IEventLogWalkerStatus>>((args, _) => capturedWalkArgs = args)
+            WalkArgs capturedWalkArgs = null;
+            GetMock<IEventLogWalker>().Setup(x => x.WalkAsync(IsAny<IPager<InsightEvent>>(), IsAny<WalkArgs>(), IsAny<Action<InsightEvent, IEventLogWalkerStatus>>()))
+                .Callback<IPager<InsightEvent>, WalkArgs, Action<InsightEvent, IEventLogWalkerStatus>>((_x, args, _y) => capturedWalkArgs = args)
                 .ReturnsAsync(new TestEventLogWalkerStatus());
 
             await ClassUnderTest.GenerateAsync(reportPeriodStartInclusive, reportPeriodEndExclusive);
@@ -138,7 +140,7 @@ namespace ExampleReports.UnitTests
                 .Callback<AccountUserCountsReportState>(reportState => capturedAccountUserCountsReportState = reportState)
                 .Returns(stateJson);
 
-            GetMock<IEventLogWalker>().Setup(x => x.WalkAsync(IsAny<WalkArgs<InsightEvent>>(), IsAny<Action<InsightEvent, IEventLogWalkerStatus>>()))
+            GetMock<IEventLogWalker>().Setup(x => x.WalkAsync(IsAny<IPager<InsightEvent>>(), IsAny<WalkArgs>(), IsAny<Action<InsightEvent, IEventLogWalkerStatus>>()))
                 .ReturnsAsync(statusMock.Object);
 
             await ClassUnderTest.GenerateAsync(reportPeriodStartInclusive, reportPeriodEndExclusive);

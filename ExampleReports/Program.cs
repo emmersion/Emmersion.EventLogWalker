@@ -11,9 +11,9 @@ namespace ExampleReports
         {
             var services = ConfigureServices();
 
+            await ComplexReport(services);
             //await SimpleReport(services);
             //await ResumeValidationReport(services);
-            await ComplexReport(services);
         }
 
         private static async Task ComplexReport(ServiceProvider services)

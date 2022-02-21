@@ -55,10 +55,9 @@ args =>
             var resumeToken = LoadState();
 
             //  NOTE: See ExampleReports.Configuration.DependencyInjectionConfig to understand the package dependency needs
-            var status = await eventLogWalker.WalkAsync(
-                new WalkArgs<InsightEvent>
+            var status = await eventLogWalker.WalkAsync(pager,
+                new WalkArgs
                 {
-                    Pager = pager,
                     StartInclusive = reportPeriodStartInclusive,
                     EndExclusive = reportPeriodEndExclusive,
                     ResumeToken = resumeToken

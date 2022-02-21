@@ -39,7 +39,7 @@ namespace ExampleReports
             var state = LoadState();
             var eventIds = state.EventIds;
 
-            var finalStatus = await walker.WalkAsync(new WalkArgs<InsightEvent> {Pager = pager, ResumeToken = state.WalkerResumeToken},
+            var finalStatus = await walker.WalkAsync(pager, new WalkArgs {ResumeToken = state.WalkerResumeToken},
                 (insightEvent, status) =>
                 {
                     if (status.PageStatus == PageStatus.Start)
