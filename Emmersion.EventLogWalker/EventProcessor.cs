@@ -6,7 +6,7 @@ namespace Emmersion.EventLogWalker
     internal interface IEventProcessor<TEvent>
         where TEvent : class
     {
-        Task ProcessEventAsync(TEvent walkedEvent, IEventLogWalkerStatus status);
+        Task ProcessEventAsync(TEvent @event, IEventLogWalkerStatus status);
     }
 
     internal class EventProcessor<TEvent> : IEventProcessor<TEvent>
@@ -21,16 +21,16 @@ namespace Emmersion.EventLogWalker
 
         public EventProcessor(Action<TEvent, IEventLogWalkerStatus> processorFunc)
         {
-            this.processorFunc = (insightEvent, status) =>
+            this.processorFunc = (@event, status) =>
             {
-                processorFunc(insightEvent, status);
+                processorFunc(@event, status);
                 return Task.CompletedTask;
             };
         }
 
-        public Task ProcessEventAsync(TEvent walkedEvent, IEventLogWalkerStatus status)
+        public Task ProcessEventAsync(TEvent @event, IEventLogWalkerStatus status)
         {
-            return processorFunc(walkedEvent, status);
+            return processorFunc(@event, status);
         }
     }
 }
