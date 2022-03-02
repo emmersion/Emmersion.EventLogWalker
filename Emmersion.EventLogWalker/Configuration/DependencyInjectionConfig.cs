@@ -19,7 +19,7 @@ namespace Emmersion.EventLogWalker.Configuration
             );
 
             services.AddSingleton<IHttpClient, HttpClient>();
-
+            services.AddTransient<IPager<InsightEvent>, InsightsSystemApiPager>();
         }
     }
 }

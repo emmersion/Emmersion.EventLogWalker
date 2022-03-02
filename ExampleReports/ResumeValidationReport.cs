@@ -19,23 +19,27 @@ namespace ExampleReports
         private readonly IEventLogWalker walker;
         private readonly IJsonSerializer jsonSerializer;
         private readonly IFileSystem fileSystem;
+        private readonly IPager<InsightEvent> pager;
         private readonly TimeTracker eventTimeTracker;
 
-        public ResumeValidationReport(IEventLogWalker walker, IJsonSerializer jsonSerializer, IFileSystem fileSystem)
+        public ResumeValidationReport(IEventLogWalker walker, IJsonSerializer jsonSerializer, IFileSystem fileSystem, IPager<InsightEvent> pager)
         {
             this.walker = walker;
             this.jsonSerializer = jsonSerializer;
             this.fileSystem = fileSystem;
+            this.pager = pager;
 
             eventTimeTracker = new TimeTracker(1);
         }
 
         public async Task GenerateAsync()
         {
+            Console.WriteLine("WARNING: This report runs across the entire event log. This report is for example/test only. Recommend abort after a few events are processed.");
+
             var state = LoadState();
             var eventIds = state.EventIds;
 
-            var finalStatus = await walker.WalkAsync(new WalkArgs {ResumeToken = state.WalkerResumeToken},
+            var finalStatus = await walker.WalkAsync(pager, new WalkArgs {ResumeToken = state.WalkerResumeToken},
                 (insightEvent, status) =>
                 {
                     if (status.PageStatus == PageStatus.Start)

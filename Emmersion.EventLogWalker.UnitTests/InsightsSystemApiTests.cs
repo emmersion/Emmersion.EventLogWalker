@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Emmersion.EventLogWalker.Configuration;
 using Emmersion.EventLogWalker.Http;
@@ -8,7 +10,7 @@ using NUnit.Framework;
 
 namespace Emmersion.EventLogWalker.UnitTests
 {
-    internal class InsightsSystemApiTests : With_an_automocked<InsightsSystemApi>
+    internal class InsightsSystemApiTests : With_an_automocked<InsightsSystemApiPager>
     {
         [Test]
         public async Task When_getting_a_page()
@@ -18,7 +20,14 @@ namespace Emmersion.EventLogWalker.UnitTests
             var insightsSystemApiBaseUrl = RandomString();
             var insightsSystemApiApiKey = RandomString();
             var serializedApiPage = RandomString();
-            var expectedPage = new Page();
+            var deserializedApiPage = new Page<InsightEvent>
+            {
+                Events = new List<InsightEvent>
+                {
+                    new InsightEvent()
+                },
+                NextPage = new Cursor(),
+            };
 
             HttpRequest capturedHttpRequest = null;
 
@@ -27,7 +36,7 @@ namespace Emmersion.EventLogWalker.UnitTests
             GetMock<IHttpClient>().Setup(x => x.ExecutePostAsync(IsAny<IHttpRequest>()))
                 .Callback<IHttpRequest>(httpRequest => capturedHttpRequest = httpRequest as HttpRequest)
                 .ReturnsAsync(new HttpResponse(200, new HttpHeaders(), serializedApiPage));
-            GetMock<IJsonSerializer>().Setup(x => x.Deserialize<Page>(serializedApiPage)).Returns(expectedPage);
+            GetMock<IJsonSerializer>().Setup(x => x.Deserialize<Page<InsightEvent>>(serializedApiPage)).Returns(deserializedApiPage);
             GetMock<IJsonSerializer>().Setup(x => x.Serialize(cursor)).Returns(cursorJson);
 
             var page = await ClassUnderTest.GetPageAsync(cursor);
@@ -39,7 +48,9 @@ namespace Emmersion.EventLogWalker.UnitTests
             Assert.That(capturedHttpRequest.Headers.Exists("Content-Type"), Is.True);
             Assert.That(capturedHttpRequest.Headers.GetValue("Content-Type"), Is.EqualTo("application/json"));
             Assert.That(capturedHttpRequest.Body, Is.EqualTo(cursorJson));
-            Assert.That(page, Is.SameAs(expectedPage));
+            Assert.That(page.Events.Count, Is.EqualTo(deserializedApiPage.Events.Count));
+            Assert.That(page.Events.Single(), Is.SameAs(deserializedApiPage.Events.Single()));
+            Assert.That(page.NextPage, Is.SameAs(deserializedApiPage.NextPage));
         }
 
         [Test]

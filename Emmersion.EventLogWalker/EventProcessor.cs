@@ -3,32 +3,34 @@ using System.Threading.Tasks;
 
 namespace Emmersion.EventLogWalker
 {
-    internal interface IEventProcessor
+    internal interface IEventProcessor<TEvent>
+        where TEvent : class
     {
-        Task ProcessEventAsync(InsightEvent insightEvent, IEventLogWalkerStatus status);
+        Task ProcessEventAsync(TEvent @event, IEventLogWalkerStatus status);
     }
 
-    internal class EventProcessor : IEventProcessor
+    internal class EventProcessor<TEvent> : IEventProcessor<TEvent>
+        where TEvent : class
     {
-        private readonly Func<InsightEvent, IEventLogWalkerStatus, Task> processorFunc;
+        private readonly Func<TEvent, IEventLogWalkerStatus, Task> processorFunc;
 
-        public EventProcessor(Func<InsightEvent, IEventLogWalkerStatus, Task> processorFunc)
+        public EventProcessor(Func<TEvent, IEventLogWalkerStatus, Task> processorFunc)
         {
             this.processorFunc = processorFunc;
         }
 
-        public EventProcessor(Action<InsightEvent, IEventLogWalkerStatus> processorFunc)
+        public EventProcessor(Action<TEvent, IEventLogWalkerStatus> processorFunc)
         {
-            this.processorFunc = (insightEvent, status) =>
+            this.processorFunc = (@event, status) =>
             {
-                processorFunc(insightEvent, status);
+                processorFunc(@event, status);
                 return Task.CompletedTask;
             };
         }
 
-        public Task ProcessEventAsync(InsightEvent insightEvent, IEventLogWalkerStatus status)
+        public Task ProcessEventAsync(TEvent @event, IEventLogWalkerStatus status)
         {
-            return processorFunc(insightEvent, status);
+            return processorFunc(@event, status);
         }
     }
 }

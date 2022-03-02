@@ -3,9 +3,10 @@ using System.Collections.Generic;
 
 namespace Emmersion.EventLogWalker
 {
-    internal class WalkState
+    internal class WalkState<TEvent>
+        where TEvent : class
     {
-        public List<InsightEvent> Events { get; set; } = new List<InsightEvent>();
+        public List<TEvent> Events { get; set; } = new List<TEvent>();
         public Cursor Cursor { get; set; }
         public Cursor PreviousCursor { get; set; }
         public int PageEventIndex { get; set; }

@@ -1,30 +1,30 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Emmersion.EventLogWalker
 {
     internal interface IStateLoader
     {
-        Task<WalkState> LoadInitialStateAsync(DateTimeOffset startInclusive, DateTimeOffset endExclusive,
-            string resumeTokenJson);
-
-        Task<WalkState> LoadNextStateAsync(WalkState previousState);
+        Task<WalkState<TEvent>> LoadInitialStateAsync<TEvent>(IPager<TEvent> pager, DateTimeOffset startInclusive, DateTimeOffset endExclusive, string resumeTokenJson)
+            where TEvent : class;
+        Task<WalkState<TEvent>> LoadNextStateAsync<TEvent>(IPager<TEvent> pager, WalkState<TEvent> previousState)
+            where TEvent : class;
     }
 
     internal class StateLoader : IStateLoader
     {
-        private readonly IInsightsSystemApi insightsSystemApi;
         private readonly IJsonSerializer jsonSerializer;
 
-        public StateLoader(IInsightsSystemApi insightsSystemApi, IJsonSerializer jsonSerializer)
+        public StateLoader(IJsonSerializer jsonSerializer)
         {
-            this.insightsSystemApi = insightsSystemApi;
             this.jsonSerializer = jsonSerializer;
         }
 
-        public async Task<WalkState> LoadInitialStateAsync(DateTimeOffset startInclusive, DateTimeOffset endExclusive,
-            string resumeTokenJson)
+        public async Task<WalkState<TEvent>> LoadInitialStateAsync<TEvent>(IPager<TEvent> pager,
+            DateTimeOffset startInclusive, DateTimeOffset endExclusive, string resumeTokenJson)
+            where TEvent : class
         {
             var cursor = new Cursor
             {
@@ -41,9 +41,9 @@ namespace Emmersion.EventLogWalker
                     cursor = resumeToken.Cursor ?? cursor;
                 }
 
-                var initialState = await LoadStateFromPageAsync(new WalkState {Cursor = cursor});
+                var initialState = await LoadStateFromPageAsync(pager, new WalkState<TEvent> {Cursor = cursor});
 
-                return new WalkState
+                return new WalkState<TEvent>
                 {
                     Events = initialState.Events,
                     Cursor = initialState.Cursor,
@@ -55,11 +55,11 @@ namespace Emmersion.EventLogWalker
             }
             catch (Exception exception)
             {
-                return new WalkState
+                return new WalkState<TEvent>
                 {
                     Cursor = cursor,
                     PreviousCursor = resumeToken?.Cursor,
-                    Events = new List<InsightEvent>(),
+                    Events = new List<TEvent>(),
                     PageEventIndex = resumeToken?.PageEventIndex ?? 0,
                     PageNumber = resumeToken?.PageNumber ?? 1,
                     TotalEventsProcessed = resumeToken?.TotalProcessedEvents ?? 0,
@@ -68,28 +68,29 @@ namespace Emmersion.EventLogWalker
             }
         }
 
-        public async Task<WalkState> LoadNextStateAsync(WalkState previousState)
+        public async Task<WalkState<TEvent>> LoadNextStateAsync<TEvent>(IPager<TEvent> pager, WalkState<TEvent> previousState)
+            where TEvent : class
         {
             try
             {
                 if (previousState.Cursor == null)
                 {
-                    return new WalkState
+                    return new WalkState<TEvent>
                     {
                         Cursor = null,
                         PreviousCursor = previousState.PreviousCursor,
-                        Events = new List<InsightEvent>(),
+                        Events = new List<TEvent>(),
                         PageEventIndex = 0,
                         PageNumber = previousState.PageNumber + 1,
                         TotalEventsProcessed = previousState.TotalEventsProcessed
                     };
                 }
 
-                return await LoadStateFromPageAsync(previousState);
+                return await LoadStateFromPageAsync(pager, previousState);
             }
             catch (Exception exception)
             {
-                return new WalkState
+                return new WalkState<TEvent>
                 {
                     PageEventIndex = previousState.PageEventIndex,
                     Cursor = previousState.Cursor,
@@ -102,11 +103,12 @@ namespace Emmersion.EventLogWalker
             }
         }
 
-        private async Task<WalkState> LoadStateFromPageAsync(WalkState previousState)
+        private async Task<WalkState<TEvent>> LoadStateFromPageAsync<TEvent>(IPager<TEvent> pager, WalkState<TEvent> previousState)
+            where TEvent : class
         {
-            var page = await insightsSystemApi.GetPageAsync(previousState.Cursor);
+            var page = await pager.GetPageAsync(previousState.Cursor);
 
-            return new WalkState
+            return new WalkState<TEvent>
             {
                 Cursor = page.NextPage,
                 PreviousCursor = previousState.Cursor,

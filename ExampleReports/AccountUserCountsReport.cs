@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Emmersion.EventLogWalker;
@@ -20,15 +21,17 @@ namespace ExampleReports
         private readonly ICsvWriter csvWriter;
         private readonly IJsonSerializer jsonSerializer;
         private readonly IFileSystem fileSystem;
+        private readonly IPager<InsightEvent> pager;
         private readonly TimeTracker eventTimeTracker;
 
         public AccountUserCountsReport(IEventLogWalker eventLogWalker, ICsvWriter csvWriter,
-            IJsonSerializer jsonSerializer, IFileSystem fileSystem)
+            IJsonSerializer jsonSerializer, IFileSystem fileSystem, IPager<InsightEvent> pager)
         {
             this.eventLogWalker = eventLogWalker;
             this.csvWriter = csvWriter;
             this.jsonSerializer = jsonSerializer;
             this.fileSystem = fileSystem;
+            this.pager = pager;
 
             eventTimeTracker = new TimeTracker(1);
         }
@@ -52,7 +55,7 @@ args =>
             var resumeToken = LoadState();
 
             //  NOTE: See ExampleReports.Configuration.DependencyInjectionConfig to understand the package dependency needs
-            var status = await eventLogWalker.WalkAsync(
+            var status = await eventLogWalker.WalkAsync(pager,
                 new WalkArgs
                 {
                     StartInclusive = reportPeriodStartInclusive,
@@ -77,7 +80,7 @@ args =>
                 $"{nameof(EventCounts.EventType)},{nameof(EventCounts.DistinctAccounts)},{nameof(EventCounts.DistinctUsers)}";
             csvWriter.WriteAll(fileName, headerRow, eventCounts);
 
-            Console.WriteLine($"Wrote to: {fileName}");
+            Console.WriteLine($"Wrote to: {Directory.GetCurrentDirectory()}\\{fileName}");
 
             fileSystem.DeleteFile(StateFilePath);
         }

@@ -1,23 +1,17 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Emmersion.EventLogWalker.Configuration;
 using Emmersion.EventLogWalker.Http;
 
 namespace Emmersion.EventLogWalker
 {
-    internal interface IInsightsSystemApi
-    {
-        Task<Page> GetPageAsync(Cursor cursor);
-    }
-
-    internal class InsightsSystemApi : IInsightsSystemApi
+    internal class InsightsSystemApiPager : IPager<InsightEvent>
     {
         private readonly IHttpClient httpClient;
         private readonly IInsightsSystemApiSettings insightsSystemApiSettings;
         private readonly IJsonSerializer jsonSerializer;
 
-        public InsightsSystemApi(IHttpClient httpClient,
+        public InsightsSystemApiPager(IHttpClient httpClient,
             IInsightsSystemApiSettings insightsSystemApiSettings,
             IJsonSerializer jsonSerializer)
         {
@@ -26,7 +20,7 @@ namespace Emmersion.EventLogWalker
             this.jsonSerializer = jsonSerializer;
         }
 
-        public async Task<Page> GetPageAsync(Cursor cursor)
+        public async Task<Page<InsightEvent>> GetPageAsync(Cursor cursor)
         {
             var request = new HttpRequest
             {
@@ -38,26 +32,16 @@ namespace Emmersion.EventLogWalker
 
             var response = await httpClient.ExecutePostAsync(request);
 
-            return response.StatusCode switch
+            var result = response.StatusCode switch
             {
-                200 => jsonSerializer.Deserialize<Page>(response.Body),
+                200 => jsonSerializer.Deserialize<Page<InsightEvent>>(response.Body),
                 403 => throw new Exception(
                     $"Double check your credentials: Got status code {response.StatusCode} when calling {request.Url} with body {request.Body}"),
                 _ => throw new Exception(
                     $"Unexpected status code {response.StatusCode} when calling {request.Url} with body {request.Body}")
             };
+
+            return result;
         }
-    }
-
-    internal class Page
-    {
-        public List<InsightEvent> Events { get; set; }
-        public Cursor NextPage { get; set; }
-    }
-
-    internal class Cursor
-    {
-        public DateTimeOffset StartInclusive { get; set; }
-        public DateTimeOffset EndExclusive { get; set; }
     }
 }
